@@ -1,15 +1,61 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id), canvas=$('world'), overlay=$('overlay'), ui=overlay.getContext('2d');
 let gl;try{gl=canvas.getContext('webgl',{alpha:true,antialias:true,powerPreference:'low-power'})}catch(e){gl=null}
-if(!gl){const backup=document.createElement('script');backup.src='fallback.js?v=20261016';backup.onerror=()=>{$('fallback').textContent='当前浏览器无法加载游戏文件，请刷新页面后重试。';$('fallback').hidden=false};document.head.appendChild(backup);return}
+if(!gl){const backup=document.createElement('script');backup.src='fallback.js?v=20261016r2';backup.onerror=()=>{$('fallback').textContent='当前浏览器无法加载游戏文件，请刷新页面后重试。';$('fallback').hidden=false};document.head.appendChild(backup);return}
 const MAP=.7,W=126,D=63, PI=Math.PI, clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
 const guns=[{name:'AK47',dmg:34,rate:.112,mag:30,reload:2.15,spread:.026,color:[.40,.28,.18]},{name:'M4A1',dmg:25,rate:.082,mag:30,reload:1.85,spread:.011,color:[.23,.28,.29]},{name:'AWM',dmg:100,rate:1.25,mag:10,reload:2.7,spread:.002,color:[.29,.31,.24]}];
-const VERT=`attribute vec3 aPos;attribute vec3 aCol;uniform vec3 uCam;uniform float uYaw,uPitch,uTan,uAspect;varying vec3 vCol;varying float vDepth;void main(){vec3 p=aPos-uCam;float c=cos(uYaw),s=sin(uYaw),cp=cos(uPitch),sp=sin(uPitch);float depth=dot(p,vec3(c*cp,sp,s*cp));float horizontal=dot(p,vec3(-s,0.,c));float vertical=dot(p,vec3(-c*sp,cp,-s*sp));gl_Position=vec4(horizontal/(uTan*uAspect),vertical/uTan,depth*.999-.12,depth);vCol=aCol;vDepth=depth;}`;
-const FRAG=`precision mediump float;varying vec3 vCol;varying float vDepth;void main(){float haze=clamp((vDepth-45.)/185.,0.,.53);gl_FragColor=vec4(mix(vCol,vec3(.63,.72,.75),haze),1.);}`;
+const VERT=`attribute vec3 aPos;attribute vec3 aCol;uniform mediump vec3 uCam;uniform float uYaw,uPitch,uTan,uAspect;varying vec3 vCol,vWorld;varying float vDepth;void main(){vec3 p=aPos-uCam;float c=cos(uYaw),s=sin(uYaw),cp=cos(uPitch),sp=sin(uPitch);float depth=dot(p,vec3(c*cp,sp,s*cp));float horizontal=dot(p,vec3(-s,0.,c));float vertical=dot(p,vec3(-c*sp,cp,-s*sp));gl_Position=vec4(horizontal/(uTan*uAspect),vertical/uTan,depth*.999-.025,depth);vCol=aCol;vWorld=aPos;vDepth=depth;}`;
+const derivatives=!!gl.getExtension('OES_standard_derivatives');
+const fp=gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER,gl.HIGH_FLOAT)?.precision>0?'highp':'mediump';
+const FRAG=(derivatives?'#extension GL_OES_standard_derivatives : enable\n':'')+`precision ${fp} float;
+varying vec3 vCol,vWorld;varying float vDepth;uniform mediump vec3 uCam;uniform float uPass;
+float noise(vec2 p){vec3 q=fract(vec3(p.xyx)*.1031);q+=dot(q,q.yzx+19.19);return fract((q.x+q.y)*q.z);}
+float grain(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(noise(i),noise(i+vec2(1.,0.)),f.x),mix(noise(i+vec2(0.,1.)),noise(i+vec2(1.)),f.x),f.y);}
+void main(){
+ if(uPass>2.5){gl_FragColor=vec4(.07,.09,.09,vCol.r);return;}
+ vec3 view=normalize(uCam-vWorld),base=vCol;
+ vec3 normal=${derivatives?'normalize(cross(dFdx(vWorld),dFdy(vWorld)))':'vec3(0.,1.,0.)'};
+ if(dot(normal,view)<0.)normal=-normal;
+ vec3 light=normalize(vec3(-.55,1.,.28));
+ float diffuse=max(dot(normal,light),0.);
+ vec2 uv=abs(normal.y)>.65?vWorld.xz:(abs(normal.x)>.65?vWorld.zy:vWorld.xy);
+ uv=mod(uv,32.);float fine=grain(uv*32.),broad=grain(uv*.7),specular=0.;
+ if(uPass<.5){
+  base*=.87+.16*broad+.06*(fine-.5);
+  bool deck=vWorld.y>.10&&vWorld.y<.20&&abs(normal.y)>.6;
+  if(deck){
+   vec2 panel=abs(fract(vWorld.xz/vec2(5.6,4.2))-.5);
+   float seam=smoothstep(.485,.499,max(panel.x,panel.y));
+   base*=1.-seam*.28;
+   float scratches=smoothstep(.86,.99,grain(vec2(uv.x*1.4,uv.y*170.)))*.12;
+   base+=vec3(scratches);float wear=grain(uv*.35);
+   float wet=smoothstep(.61,.79,wear)*.38;
+   base=mix(base,vec3(.20,.26,.28),wet);
+   specular=wet*pow(max(dot(reflect(-light,normal),view),0.),24.)*.85;
+  }else{
+   float colored=max(base.r,max(base.g,base.b))-min(base.r,min(base.g,base.b));
+   float paint=step(.045,colored)*step(.3,vWorld.y)*step(vWorld.y,6.5);
+   float streak=grain(vec2(uv.x*4.,uv.y*.22));
+   float corrosion=smoothstep(.66,.88,streak)*paint*(.25+.55*exp(-vWorld.y*.7));
+   base=mix(base,vec3(.28,.15,.075),corrosion);
+   float edge=smoothstep(.87,.97,fine)*paint*.10;base+=vec3(edge);
+   specular=pow(max(dot(reflect(-light,normal),view),0.),38.)*.07;
+  }
+ }else{
+  base*=.96+.08*(fine-.5);
+  float metal=step(max(base.r,max(base.g,base.b)),.28);
+  specular=pow(max(dot(reflect(-light,normal),view),0.),uPass>1.5?50.:24.)*metal*(uPass>1.5?.27:.13);
+ }
+ vec3 col=base*(.71+diffuse*.43)+vec3(specular)*vec3(1.,.93,.81);
+ col+=base*.045*vec3(.65,.83,1.)*(1.-max(normal.y,0.));
+ float haze=clamp(1.-exp(-max(vDepth-22.,0.)*.004),0.,.62)*(uPass>1.5?0.:1.);
+ col=mix(col,vec3(.65,.73,.75),haze);
+ gl_FragColor=vec4(clamp(col,0.,1.),1.);
+}`.replace(/^\+/gm,'');
 function shader(type,src){let sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(sh));return sh}
 let prog=gl.createProgram();gl.attachShader(prog,shader(gl.VERTEX_SHADER,VERT));gl.attachShader(prog,shader(gl.FRAGMENT_SHADER,FRAG));gl.linkProgram(prog);if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(prog));gl.useProgram(prog);
-const loc={pos:gl.getAttribLocation(prog,'aPos'),col:gl.getAttribLocation(prog,'aCol'),cam:gl.getUniformLocation(prog,'uCam'),yaw:gl.getUniformLocation(prog,'uYaw'),pitch:gl.getUniformLocation(prog,'uPitch'),tan:gl.getUniformLocation(prog,'uTan'),aspect:gl.getUniformLocation(prog,'uAspect')};
-let staticBuffer=gl.createBuffer(),dynamicBuffer=gl.createBuffer(),staticCount=0;gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);
+const loc={pos:gl.getAttribLocation(prog,'aPos'),col:gl.getAttribLocation(prog,'aCol'),cam:gl.getUniformLocation(prog,'uCam'),yaw:gl.getUniformLocation(prog,'uYaw'),pitch:gl.getUniformLocation(prog,'uPitch'),tan:gl.getUniformLocation(prog,'uTan'),aspect:gl.getUniformLocation(prog,'uAspect'),pass:gl.getUniformLocation(prog,'uPass')};
+let staticBuffer=gl.createBuffer(),dynamicBuffer=gl.createBuffer(),shadowBuffer=gl.createBuffer(),staticCount=0;gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 function vertex(arr,p,c){arr.push(p[0],p[1],p[2],c[0],c[1],c[2])}
 function face(arr,a,b,c,d,color,m=1){let co=color.map(v=>v*m);for(let p of [a,b,c,a,c,d])vertex(arr,p,co)}
 function box(arr,x,y,z,w,h,d,c){if(arr===mesh){x*=MAP;z*=MAP;w*=MAP;d*=MAP}let x1=x+w,y1=y+h,z1=z+d;face(arr,[x,y1,z],[x1,y1,z],[x1,y1,z1],[x,y1,z1],c,1.15);face(arr,[x,y,z1],[x1,y,z1],[x1,y,z],[x,y,z],c,.46);face(arr,[x,y,z],[x1,y,z],[x1,y1,z],[x,y1,z],c,.8);face(arr,[x1,y,z1],[x,y,z1],[x,y1,z1],[x1,y1,z1],c,.9);face(arr,[x,y,z1],[x,y,z],[x,y1,z],[x,y1,z1],c,.65);face(arr,[x1,y,z],[x1,y,z1],[x1,y1,z1],[x1,y1,z],c,.73)}
@@ -29,13 +75,14 @@ box(mesh,81,6,39,18,.6,12,[.19,.25,.29]);for(let i=0;i<4;i++){box(mesh,82+i*4,4.
 for(let z of [27,62]){box(mesh,4,.13,z,20,.018,.35,[.62,.62,.53]);box(mesh,156,.13,z,20,.018,.35,[.62,.62,.53])}
 window.DeckVisuals.scenery((...v)=>box(mesh,...v));
 function renderBuffer(arr,buf,count){gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(arr),buf===staticBuffer?gl.STATIC_DRAW:gl.DYNAMIC_DRAW);gl.enableVertexAttribArray(loc.pos);gl.enableVertexAttribArray(loc.col);gl.vertexAttribPointer(loc.pos,3,gl.FLOAT,false,24,0);gl.vertexAttribPointer(loc.col,3,gl.FLOAT,false,24,12);gl.drawArrays(gl.TRIANGLES,0,count)}
+const shadows=window.DeckVisuals.cargoShadows(blocks);
 staticCount=mesh.length/6;gl.bindBuffer(gl.ARRAY_BUFFER,staticBuffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(mesh),gl.STATIC_DRAW);mesh=null;
 function drawStored(buf,count){gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.enableVertexAttribArray(loc.pos);gl.enableVertexAttribArray(loc.col);gl.vertexAttribPointer(loc.pos,3,gl.FLOAT,false,24,0);gl.vertexAttribPointer(loc.col,3,gl.FLOAT,false,24,12);gl.drawArrays(gl.TRIANGLES,0,count)}
 let actors=[],player=null,score=[0,0],seconds=0,mode='menu',keys={},mouseDown=false,touchFire=false,aim={dx:0,dz:0},touchAim=null,scoped=false,damageFlash=0,hitMark=0,shotFlash=0,bob=0,announceTimer=0,feeds=[];
 const len=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);function free(x,z,r=.8){return x>r+1&&z>r+1&&x<W-r-1&&z<D-r-1&&!blocks.some(b=>x+r>b.x&&x-r<b.x+b.w&&z+r>b.z&&z-r<b.z+b.d)}
 function spawn(team){for(let i=0;i<50;i++){let p={x:(team?rnd(140,155):rnd(25,40))*MAP,z:rnd(24,66)*MAP};if(free(p.x,p.z)&&actors.every(a=>a.team!==team||Math.hypot(a.x-p.x,a.z-p.z)>4.5))return p}return{x:(team?158:22)*MAP,z:45*MAP}}
 function makeActor(team,i,human=false){let p=spawn(team);return{...p,team,human,name:human?($('nickname').value.trim().slice(0,16)||'游客'):`${team?'红':'蓝'}队 ${i+1}`,yaw:team?PI:0,pitch:0,y:0,vy:0,hp:100,dead:0,gun:human?1:i%3,ammo:[30,30,10],cd:rnd(0,.5),reloading:0,kills:0,deaths:0,strafe:Math.random()<.5?-1:1,think:0}}
-function move(a,dx,dz){let ox=a.x,oz=a.z,nx=a.x+dx;if(free(nx,a.z))a.x=nx;let nz=a.z+dz;if(free(a.x,nz))a.z=nz;let d=Math.hypot(a.x-ox,a.z-oz);a.walk=(a.walk||0)+d*3.2;a.motion=d>.001?1:(a.motion||0)*.85}
+function move(a,dx,dz){let ox=a.x,oz=a.z,nx=a.x+dx;if(free(nx,a.z))a.x=nx;let nz=a.z+dz;if(free(a.x,nz))a.z=nz;let d=Math.hypot(a.x-ox,a.z-oz);a.walk=(a.walk||0)+d*1.15;a.motion=d>.001?1:(a.motion||0)*.85}
 function rayBox(px,pz,dx,dz,b){let t0=0,t1=1e6;for(let [p,v,lo,hi] of [[px,dx,b.x,b.x+b.w],[pz,dz,b.z,b.z+b.d]]){if(Math.abs(v)<1e-8){if(p<lo||p>hi)return Infinity}else{let a=(lo-p)/v,c=(hi-p)/v;if(a>c)[a,c]=[c,a];t0=Math.max(t0,a);t1=Math.min(t1,c);if(t0>t1)return Infinity}}return t0}
 function wallDistance(px,pz,dx,dz){let best=Infinity;for(let b of blocks)best=Math.min(best,rayBox(px,pz,dx,dz,b));return best}
 function visible(a,b){let d=len(a,b),dx=(b.x-a.x)/d,dz=(b.z-a.z)/d;return wallDistance(a.x,a.z,dx,dz)>d-.2}
@@ -57,12 +104,23 @@ function update(dt){if(mode!=='playing')return;seconds+=dt;if(seconds>=360){fini
 for(let a of actors){if(a.dead){a.dead-=dt;if(a.dead<=0){Object.assign(a,spawn(a.team));a.dead=0;a.hp=100;a.y=0;a.vy=0;a.ammo=[30,30,10];a.reloading=0;if(a.human){hud();announce('重新加入战斗',1)}}continue}a.motion=(a.motion||0)*Math.exp(-dt*7);a.muzzle=Math.max(0,(a.muzzle||0)-dt);a.cd=Math.max(0,a.cd-dt);if(a.reloading){a.reloading-=dt;if(a.reloading<=0){a.reloading=0;a.ammo[a.gun]=guns[a.gun].mag;if(a.human)hud()}}if(a.human){if(a.y>0||a.vy>0){a.y+=a.vy*dt;a.vy-=25*dt;if(a.y<=0){a.y=0;a.vy=0}}let f=(keys.w?1:0)-(keys.s?1:0)-aim.dz,r=(keys.d?1:0)-(keys.a?1:0)+aim.dx,m=Math.hypot(f,r);if(m){let speed=(keys.shift?24:17.5)*dt;move(a,(Math.cos(a.yaw)*f-Math.sin(a.yaw)*r)/m*speed,(Math.sin(a.yaw)*f+Math.cos(a.yaw)*r)/m*speed);bob+=dt*(keys.shift?15:11)}if(mouseDown||touchFire)fire(a)}else bot(a,dt)}}
 function charMesh(arr,a){window.DeckVisuals.soldier(a,arr)}
 function resize(){let d=Math.min(devicePixelRatio||1,1.5);canvas.width=Math.max(1,Math.floor(innerWidth*d));canvas.height=Math.max(1,Math.floor(innerHeight*d));overlay.width=canvas.width;overlay.height=canvas.height;gl.viewport(0,0,canvas.width,canvas.height)}
-function render3D(){gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);if(!player)return;let fov=scoped?(player.gun===2?36:65):78,camY=player.dead?1.0:1.62+player.y,aspect=canvas.width/canvas.height;gl.uniform3f(loc.cam,player.x,camY,player.z);gl.uniform1f(loc.yaw,player.yaw);gl.uniform1f(loc.pitch,player.pitch);gl.uniform1f(loc.tan,Math.tan(fov*PI/360));gl.uniform1f(loc.aspect,aspect);drawStored(staticBuffer,staticCount);let arr=[];for(let a of actors)if(a!==player)charMesh(arr,a);if(arr.length)renderBuffer(arr,dynamicBuffer,arr.length/6)}
+function render3D(){
+ gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);if(!player)return;
+ let fov=scoped?(player.gun===2?36:65):78,camY=player.dead?1.0:1.62+player.y,aspect=canvas.width/canvas.height;
+ gl.uniform3f(loc.cam,player.x,camY,player.z);gl.uniform1f(loc.yaw,player.yaw);gl.uniform1f(loc.pitch,player.pitch);gl.uniform1f(loc.tan,Math.tan(fov*PI/360));gl.uniform1f(loc.aspect,aspect);
+ gl.uniform1f(loc.pass,0);drawStored(staticBuffer,staticCount);
+ gl.uniform1f(loc.pass,3);gl.depthMask(false);let ground=shadows.concat(window.DeckVisuals.actorShadows(actors));renderBuffer(ground,shadowBuffer,ground.length/6);gl.depthMask(true);
+ let arr=[];for(let a of actors)if(a!==player)charMesh(arr,a);gl.uniform1f(loc.pass,1);if(arr.length)renderBuffer(arr,dynamicBuffer,arr.length/6);
+ if(!player.dead&&!(scoped&&player.gun===2)){
+  gl.clear(gl.DEPTH_BUFFER_BIT);gl.uniform3f(loc.cam,0,0,0);gl.uniform1f(loc.yaw,0);gl.uniform1f(loc.pitch,0);gl.uniform1f(loc.tan,Math.tan(60*PI/360));gl.uniform1f(loc.pass,2);
+  let gun=window.DeckVisuals.weapon({gun:player.gun,bob,flash:shotFlash,jump:player.y,reloading:player.reloading,scoped});renderBuffer(gun,dynamicBuffer,gun.length/6);
+ }
+}
 function polygon(points,fill,stroke){ui.beginPath();ui.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ui.lineTo(points[i][0],points[i][1]);ui.closePath();ui.fillStyle=fill;ui.fill();if(stroke){ui.strokeStyle=stroke;ui.lineWidth=2;ui.stroke()}}
 function drawEnemyMarkers(ctx,w,h){if(!player||player.dead)return;let c=Math.cos(player.yaw),s=Math.sin(player.yaw),cp=Math.cos(player.pitch),sp=Math.sin(player.pitch),eye=1.62+player.y,fov=scoped?(player.gun===2?36:65):78,plane=h/(2*Math.tan(fov*PI/360));for(let a of actors){if(a.team===0||a.dead||len(a,player)>85||!visible(player,a))continue;let dx=a.x-player.x,dz=a.z-player.z,front=dx*c+dz*s,right=-dx*s+dz*c,vertical=(2.5-eye)*cp-front*sp,depth=front*cp+(2.5-eye)*sp;if(depth<1)continue;let px=w/2+right/depth*plane,py=h/2-vertical/depth*plane;if(px<12||px>w-12||py<16||py>h-16)continue;ctx.fillStyle='#ff756b';ctx.beginPath();ctx.moveTo(px,py+3);ctx.lineTo(px-7,py-8);ctx.lineTo(px+7,py-8);ctx.closePath();ctx.fill()}}
 function renderHud(){let w=overlay.width,h=overlay.height,scale=w/innerWidth;ui.setTransform(1,0,0,1,0,0);ui.clearRect(0,0,w,h);if(mode==='menu'||!player)return;let cx=w/2,cy=h/2;ui.lineWidth=Math.max(1.4,scale*1.4);ui.strokeStyle='#f5eee0dc';let gap=scoped?5:9,arm=scoped?5:8;for(let [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]){ui.beginPath();ui.moveTo(cx+dx*gap*scale,cy+dy*gap*scale);ui.lineTo(cx+dx*(gap+arm)*scale,cy+dy*(gap+arm)*scale);ui.stroke()}ui.fillStyle='#e8e5d8';ui.fillRect(cx-1,cy-1,2,2);drawEnemyMarkers(ui,w,h);
 if(hitMark){ui.strokeStyle='#ffdc89';ui.lineWidth=2.6*scale;for(let dx of [-1,1])for(let dy of [-1,1]){ui.beginPath();ui.moveTo(cx+dx*13*scale,cy+dy*13*scale);ui.lineTo(cx+dx*21*scale,cy+dy*21*scale);ui.stroke()}}
-if(scoped&&player.gun===2){let radius=Math.min(w,h)*.41;ui.fillStyle='#020a0bc9';ui.beginPath();ui.rect(0,0,w,h);ui.arc(cx,cy,radius,0,PI*2,true);ui.fill('evenodd');ui.strokeStyle='#15252ddc';ui.lineWidth=8*scale;ui.beginPath();ui.arc(cx,cy,radius,0,PI*2);ui.stroke();ui.strokeStyle='#172325bd';ui.lineWidth=1;ui.beginPath();ui.moveTo(cx-radius,cy);ui.lineTo(cx+radius,cy);ui.moveTo(cx,cy-radius);ui.lineTo(cx,cy+radius);ui.stroke()}else if(!player.dead){window.drawWeaponModel(ui,{width:w,height:h,gun:player.gun,flash:shotFlash,bob,jump:player.y,reloading:player.reloading})}
+if(scoped&&player.gun===2){let radius=Math.min(w,h)*.41;ui.fillStyle='#020a0bc9';ui.beginPath();ui.rect(0,0,w,h);ui.arc(cx,cy,radius,0,PI*2,true);ui.fill('evenodd');ui.strokeStyle='#15252ddc';ui.lineWidth=8*scale;ui.beginPath();ui.arc(cx,cy,radius,0,PI*2);ui.stroke();ui.strokeStyle='#172325bd';ui.lineWidth=1;ui.beginPath();ui.moveTo(cx-radius,cy);ui.lineTo(cx+radius,cy);ui.moveTo(cx,cy-radius);ui.lineTo(cx,cy+radius);ui.stroke()}else if(!player.dead){/* The first-person weapon is rendered in 3D. */}
 if(damageFlash){let grad=ui.createRadialGradient(cx,cy,Math.min(w,h)*.18,cx,cy,Math.max(w,h)*.65);grad.addColorStop(0,'#ba2e1b00');grad.addColorStop(1,`rgba(190,36,27,${damageFlash*.85})`);ui.fillStyle=grad;ui.fillRect(0,0,w,h)}if(player.dead){ui.fillStyle='#05101888';ui.fillRect(0,0,w,h)}}
 function loop(t){let dt=Math.min(.05,(t-(loop.last||t))/1000);loop.last=t;update(dt);render3D();renderHud();requestAnimationFrame(loop)}
 $('nickname').value=`游客${Math.floor(rnd(100,999))}`;$('start').onclick=start;$('again').onclick=start;$('resume').onclick=()=>{mode='playing';$('pause').hidden=true;lock()};$('quit').onclick=$('leave').onclick=leave;
