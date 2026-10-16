@@ -18,7 +18,7 @@ for(const backend of ['game.js','fallback.js']){
  console.log(backend,{guest:true,jump:true,shoot:true,headshot:true,killCounter:true,collision:true,audio:true,settlementOnce:true,tenPlayerResults:true,qualitySettings:true,backgroundPause:true,abandonNoReward:true});
  if(calls.scene)fs.writeFileSync(__dirname+'/geometry.json',JSON.stringify({shaders:calls.shaders,shadows:s.DeckVisuals.cargoShadows(s.__qa.blocks).concat(s.DeckVisuals.actorShadows([{x:23,z:30},{x:25,z:33}])),weapons:[0,1,2].map(gun=>s.DeckVisuals.weapon({gun})),scene:calls.scene,blue:s.DeckVisuals.soldier({x:23,z:30,yaw:Math.PI,team:0,gun:1,motion:.8,walk:.7}),red:s.DeckVisuals.soldier({x:25,z:33,yaw:Math.PI-.35,team:1,gun:0,motion:1,walk:1.9}),front:s.DeckVisuals.soldier({x:0,z:0,yaw:0,team:0,gun:1,motion:0}),side:s.DeckVisuals.soldier({x:0,z:0,yaw:0,team:1,gun:2,motion:1,walk:1.3})}));
 }
-const env=sandbox(false);env.load('game.js');assert.equal(env.calls.fallback,'fallback.js?v=20261016p3');console.log('WebGL unavailable: automatic Canvas fallback loads.');
+const env=sandbox(false);env.load('game.js');assert.equal(env.calls.fallback,'fallback.js?v=20261016p4');console.log('WebGL unavailable: automatic Canvas fallback loads.');
 const html=fs.readFileSync(root+'index.html','utf8');for(const match of html.matchAll(/(?:src|href)="([^"?#]+)(?:[^"\s]*)"/g)){if(match[1]==='#')continue;assert(fs.existsSync(root+match[1]),'missing asset '+match[1])}const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);assert.equal(ids.length,new Set(ids).size,'duplicate ids');
 const app=sandbox();const {s,els}=app;
 // Earned-only cosmetics: locked selections cannot consume unavailable points.
