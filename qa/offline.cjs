@@ -1,0 +1,10 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert'),{root}=require('./harness.cjs');
+(async()=>{
+ const base='https://example.test/game/',handlers={},cacheMap=new Map(),existing=new Set(['unrelated-cache','deckfire-previous']),toURL=v=>new URL(typeof v==='string'?v:v.url,base).href;
+ const caches={async open(name){if(!cacheMap.has(name))cacheMap.set(name,new Map());const cache=cacheMap.get(name);return{async addAll(paths){for(const path of paths){const file=path==='./'?'index.html':path.replace(/^\.\//,'').split('?')[0];assert(fs.existsSync(root+file),'offline asset missing: '+file);cache.set(toURL(path),{cached:file})}},async match(request){return cache.get(toURL(request))}}},async keys(){return[...existing,...cacheMap.keys()]},async delete(name){existing.delete(name);cacheMap.delete(name)}};
+ let online=true;const context={self:{location:{origin:'https://example.test'},addEventListener:(n,f)=>handlers[n]=f},caches,URL,Response:{error:()=>({error:true})},fetch:async request=>{if(!online)throw Error('offline');return{network:toURL(request)}}};vm.createContext(context);vm.runInContext(fs.readFileSync(root+'sw.js','utf8'),context);
+ let pending;handlers.install({waitUntil:p=>pending=p});await pending;assert(cacheMap.values().next().value.size>=12);handlers.activate({waitUntil:p=>pending=p});await pending;assert(existing.has('unrelated-cache'));assert(!existing.has('deckfire-previous'));
+ async function request(path,mode='cors'){let result;handlers.fetch({request:{url:base+path,method:'GET',mode},respondWith:p=>result=p});return await result}
+ assert((await request('game.js?v=20261016p3')).cached==='game.js');assert((await request('game.js?v=other')).network,'new asset versions must not silently use an old cached script');online=false;assert((await request('?v=20261016p3','navigate')).cached==='index.html');assert((await request('app.js?v=20261016p3')).cached==='app.js');
+ console.log('Offline cache asset completeness, version isolation, navigation fallback and unrelated-cache preservation passed.');
+})().catch(e=>{console.error(e);process.exitCode=1});

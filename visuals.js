@@ -172,7 +172,7 @@ function weaponBase(gun){
 function weapon(o){
  const mesh=weaponBase(o.gun),out=[],reload=o.reloading>0?Math.sin(Math.min(1,o.reloading/2)*Math.PI)*.13:0,recoil=o.flash>0?o.flash*.37:0;
  const cx=.50-recoil,cy=-.235+Math.sin(o.bob||0)*.004-reload-(o.jump||0)*.006,cz=o.scoped?.10:.245,roll=reload*.9,cr=Math.cos(roll),sr=Math.sin(roll);
- for(let i=0;i<mesh.length;i+=6){let x=mesh[i],y=mesh[i+1],z=mesh[i+2];out.push(cx+x,cy+y*cr-z*sr,cz+z*cr+y*sr,mesh[i+3],mesh[i+4],mesh[i+5])}
+ for(let i=0;i<mesh.length;i+=6){let x=mesh[i],y=mesh[i+1],z=mesh[i+2];let color=mesh.slice(i+3,i+6);if(o.skin&&x>.05&&y>-.06&&Math.max(...color)<.65){let light=.5+Math.max(...color);color=o.skin.map(v=>v*light)}out.push(cx+x,cy+y*cr-z*sr,cz+z*cr+y*sr,...color)}
  if(o.flash>0){const x=cx+(o.gun===0?1.015:o.gun===1?.92:1.05),c=[1,.84,.42];limb(out,[x,cy+.02,cz],[x+.16,cy+.02,cz],.046,.006,c,8)}
  return out;
 }
