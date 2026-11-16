@@ -86,8 +86,8 @@ function soldier(a,out=[]){
  actorPoses.set(a,{key:poseKey,mesh:local});}
  let cs=Math.cos(a.yaw),sn=Math.sin(a.yaw),fall=a.dead?Math.min(1,(2.8-a.dead)/.55)*1.48:0,cf=Math.cos(fall),sf=Math.sin(fall),base=a.y||0;
 
- for(let i=0;i<local.length;i+=6){let x=local[i],y=local[i+1]*1.045+bounce,z=local[i+2]*.88;if(fall){let nx=x*cf-y*sf;y=x*sf+y*cf+.12;x=nx}
- out.push(a.x+x*cs-z*sn,Math.max(.025,y+base),a.z+x*sn+z*cs,local[i+3],local[i+4],local[i+5])}
+ const tint=Math.min(.45,(a.hitFlash||0)*2.8);for(let i=0;i<local.length;i+=6){let x=local[i],y=local[i+1]*1.045+bounce,z=local[i+2]*.88;if(fall){let nx=x*cf-y*sf;y=x*sf+y*cf+.12;x=nx}
+ out.push(a.x+x*cs-z*sn,Math.max(.025,y+base),a.z+x*sn+z*cs,local[i+3]*(1-tint)+.9*tint,local[i+4]*(1-tint)+.14*tint,local[i+5]*(1-tint)+.08*tint)}
  return out;
 }
 function container(b,x,z,w,d,h,c){
