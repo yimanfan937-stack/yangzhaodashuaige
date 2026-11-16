@@ -197,5 +197,11 @@ function weapon(o){
  if(o.flash>0&&o.gun<4){const x=cx+(o.gun===0?1.015:o.gun===1?.92:1.05),c=[1,.84,.42];limb(out,[x,cy+.02,cz],[x+.16,cy+.02,cz],.046,.006,c,8)}
  return out;
 }
-window.DeckVisuals={soldier,container,scenery,box:cube,cargoShadows,actorShadows,weapon};
+// About 200 triangles instead of thousands; cache local poses for distant actors.
+const lodCache=new WeakMap();
+function soldierLOD(a,out=[]){if(a.dead&&a.dead<1.75)return out;const phase=Math.round((a.walk||0)*3)/3,key=[a.team,a.gun,phase,a.motion>.1].join('|');let c=lodCache.get(a),mesh;
+if(c?.key===key)mesh=c.mesh;else{mesh=[];const suit=a.team?[.51,.39,.29]:[.29,.39,.43],armor=a.team?[.30,.28,.23]:[.15,.23,.27],swing=Math.sin(phase)*.25*(a.motion>.1?1:0);cube(mesh,-.22,.95,-.38,.44,.73,.76,suit);cube(mesh,.20,1.14,-.31,.12,.44,.62,armor);cube(mesh,-.31,1.12,-.31,.12,.43,.62,armor);cube(mesh,-.18,1.71,-.23,.40,.38,.46,armor);cube(mesh,.21,1.77,-.20,.035,.18,.40,dark);for(let sign of [-1,1]){cube(mesh,sign*swing-.14,.10,sign*.22-.12,.26,.88,.24,suit);cube(mesh,sign*swing-.14,.02,sign*.22-.13,.42,.17,.26,dark);cube(mesh,.10,1.08,sign*.40,.54,.24,.21,suit)}cube(mesh,.47,1.25,-.14,a.gun<3?.68:a.gun===3?.26:.16,.13,.16,dark);lodCache.set(a,{key,mesh})}
+const cs=Math.cos(a.yaw),sn=Math.sin(a.yaw),sy=a.crouch?.76:1.045,tint=Math.min(.45,(a.hitFlash||0)*2.8);for(let i=0;i<mesh.length;i+=6){const x=mesh[i],z=mesh[i+2];out.push(a.x+x*cs-z*sn,mesh[i+1]*sy+(a.y||0),a.z+x*sn+z*cs,mesh[i+3]*(1-tint)+.9*tint,mesh[i+4]*(1-tint)+.14*tint,mesh[i+5]*(1-tint)+.08*tint)}return out;}
+
+window.DeckVisuals={soldierLOD,soldier,container,scenery,box:cube,cargoShadows,actorShadows,weapon};
 })();
