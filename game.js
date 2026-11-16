@@ -5,7 +5,7 @@ function compatibility(reason){
  if(reason)console.warn('Deckfire 3D initialization failed; switching to Canvas:',String(reason));
  // A canvas that has acquired WebGL cannot later acquire a 2D context.
  const replacement=canvas.cloneNode(false);canvas.replaceWith(replacement);
- const backup=document.createElement('script');backup.src='fallback.js?v=20261116fix2';backup.onerror=()=>window.DeckBoot?.fail();document.head.appendChild(backup);
+ const backup=document.createElement('script');backup.src='fallback.js?v=20261116fix3';backup.onerror=()=>window.DeckBoot?.fail();document.head.appendChild(backup);
 }
 let gl;try{if(new URLSearchParams(location.search).get('renderer')!=='canvas')gl=canvas.getContext('webgl',{alpha:true,antialias:true,powerPreference:'low-power'})}catch(e){gl=null}
 if(!gl){compatibility();return}
@@ -123,7 +123,7 @@ function render3D(){
  let arr=[];for(let a of actors){if(a===player)continue;let dx=a.x-player.x,dz=a.z-player.z,front=dx*Math.cos(player.yaw)+dz*Math.sin(player.yaw);if(front<-3||dx*dx+dz*dz>95*95)continue;charMesh(arr,a);}gl.uniform1f(loc.pass,1);if(arr.length)renderBuffer(arr,dynamicBuffer,arr.length/6);
  if(!player.dead&&!(scoped&&player.gun===2)){
   gl.clear(gl.DEPTH_BUFFER_BIT);gl.uniform3f(loc.cam,0,0,0);gl.uniform1f(loc.yaw,0);gl.uniform1f(loc.pitch,0);gl.uniform1f(loc.tan,Math.tan(60*PI/360));gl.uniform1f(loc.pass,2);
-  let gun=window.DeckVisuals.weapon({gun:player.gun,bob,flash:shotFlash,jump:player.y,reloading:player.reloading,scoped,skin:window.DeckApp.skin});renderBuffer(gun,dynamicBuffer,gun.length/6);
+  let gun=window.DeckVisuals.weapon({gun:player.gun,bob,flash:shotFlash,jump:player.y,reloading:player.reloading,scoped,skin:window.DeckApp.skin,aspect});renderBuffer(gun,dynamicBuffer,gun.length/6);
  }
 }
 function polygon(points,fill,stroke){ui.beginPath();ui.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ui.lineTo(points[i][0],points[i][1]);ui.closePath();ui.fillStyle=fill;ui.fill();if(stroke){ui.strokeStyle=stroke;ui.lineWidth=2;ui.stroke()}}

@@ -7,6 +7,6 @@ function fail(){if(ready)return;clearTimeout(timer);status('加载未完成。�
 window.DeckBoot={ready(renderer){ready=true;clearTimeout(timer);const b=start();if(b){b.disabled=false;b.textContent='游客开始战斗 ↗'}status(renderer==='canvas'?'兼容模式已就绪':'3D 模式已就绪','ready')},compatibility(){status('正在切换兼容模式…')},fail};
 window.addEventListener('error',e=>{if(e.target?.tagName==='SCRIPT'||e.message)fail()},true);
 window.addEventListener('unhandledrejection',()=>fail());
-const compatibility=document.getElementById('compatibility');if(compatibility)compatibility.onclick=()=>{const url=new URL(location.href);url.searchParams.set('renderer','canvas');url.searchParams.set('v','20261116fix2');location.assign(url.href)};
+const compatibility=document.getElementById('compatibility');if(compatibility)compatibility.onclick=()=>{const url=new URL(location.href);url.searchParams.set('renderer','canvas');url.searchParams.set('v','20261116fix3');location.assign(url.href)};
 timer=setTimeout(fail,15000);
 })();

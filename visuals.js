@@ -27,7 +27,7 @@ function limb(o,a,b,r1,r2,col,sides=10){
  let ref=Math.abs(axis[1])<.9?[0,1,0]:[1,0,0];let u=[axis[1]*ref[2]-axis[2]*ref[1],axis[2]*ref[0]-axis[0]*ref[2],axis[0]*ref[1]-axis[1]*ref[0]],ul=Math.hypot(...u);u=u.map(v=>v/ul);
  let v=[axis[1]*u[2]-axis[2]*u[1],axis[2]*u[0]-axis[0]*u[2],axis[0]*u[1]-axis[1]*u[0]],p=[],q=[];
  for(let i=0;i<sides;i++){let t=TAU*i/sides,k=u.map((n,j)=>n*Math.cos(t)+v[j]*Math.sin(t));p.push(a.map((n,j)=>n+k[j]*r1));q.push(b.map((n,j)=>n+k[j]*r2))}
- for(let i=0;i<sides;i++){let j=(i+1)%sides;quad(o,p[j],p[i],q[i],q[j],col);triangle(o,a,p[i],p[j],col);triangle(o,b,q[j],q[i],col)}
+ for(let i=0;i<sides;i++){let j=(i+1)%sides;quad(o,p[i],p[j],q[j],q[i],col);triangle(o,a,p[j],p[i],col);triangle(o,b,q[i],q[j],col)}
 }
 function upper(team,gun){
  const key=team*3+gun;if(cache.has(key))return cache.get(key);let o=[];
@@ -151,7 +151,7 @@ function weaponBase(gun){
   b(.10,-.045,-.045,.30,.11,.09,steel);b(.35,-.02,-.043,.26,.085,.086,black);tube(.35,.02,0,.26,.046,black);
   for(let i=0;i<10;i++){b(.345+i*.026,.065,-.042,.013,.015,.084,steel);for(const z of [-.045,.042])b(.37+i*.022,.005,z,.013,.027,.003,[.29,.32,.32])}
   tube(.60,.02,0,.29,.014,steel);tube(.85,.02,0,.07,.022,black);for(let i=0;i<4;i++)b(.87+i*.01,.015,-.024,.004,.01,.048,[.32,.34,.33]);
-  b(.17,.073,-.04,.16,.02,.08,black);b(.21,.09,-.035,.02,.05,.07,steel);b(.30,.09,-.035,.02,.05,.07,steel);b(.21,.14,-.035,.11,.018,.07,black);
+  b(.17,.073,-.04,.16,.02,.08,black);b(.21,.09,-.035,.02,.012,.07,steel);b(.21,.10,-.035,.02,.04,.010,steel);b(.21,.10,.025,.02,.04,.010,steel);b(.30,.09,-.035,.02,.05,.07,steel);b(.21,.14,-.035,.11,.018,.07,black);
   b(.69,.032,-.016,.015,.09,.032,black);b(.69,.116,-.022,.015,.012,.044,steel);
   b(.24,-.22,-.027,.095,.18,.054,steel);for(let i=0;i<4;i++)b(.25,-.20+i*.038,-.028,.07,.006,.056,[.31,.34,.32]);
  }else{
@@ -164,18 +164,27 @@ function weaponBase(gun){
   for(const z of [-.035,.035])limb(o,[.65,.005,z],[.52,-.12,z*2],.009,.009,black,8);
  }
  // Receiver seams, trigger guard, fire selector, screws, ejection port and grip.
- b(.13,-.16,-.028,.075,.12,.056,black);b(.10,-.10,-.032,.12,.012,.064,steel);b(.20,-.09,-.032,.012,.08,.064,steel);
+ limb(o,[.16,-.045,0],[.115,-.165,0],.032,.025,black,8);b(.10,-.10,-.032,.12,.012,.064,steel);b(.20,-.09,-.032,.012,.08,.064,steel);
  b(.13,-.14,-.013,.012,.06,.026,steel);b(.20,.015,-.046,.105,.04,.003,black);b(.30,.026,-.049,.018,.012,.007,[.48,.50,.47]);
  b(.09,.05,-.043,.25,.004,.006,[.45,.47,.44]);for(let i=0;i<4;i++)b(.12+i*.06,-.022,-.047,.005,.007,.003,[.52,.53,.48]);
- // Cloth sleeves and shaped tactical gloves, with fingers around the pistol grip.
- limb(o,[-.20,-.34,.15],[.145,-.16,.045],.085,.045,[.23,.28,.26],12);limb(o,[.145,-.16,.045],[.17,-.09,.02],.047,.042,[.10,.12,.115],12);
- limb(o,[.05,-.36,-.16],[.53,-.05,-.04],.075,.038,[.23,.28,.26],12);limb(o,[.49,-.05,-.04],[.58,-.025,-.026],.04,.035,[.11,.13,.12],12);
- for(let i=0;i<4;i++){limb(o,[.14,-.09-i*.014,-.034],[.19,-.08-i*.014,-.032],.011,.010,[.16,.18,.16],8);b(.49+i*.019,-.054,-.071,.014,.035,.012,[.15,.17,.15])}
+ // Hands are built from fixed weapon-space grip and support anchors.
+ const glove=[.105,.125,.115],cloth=[.23,.28,.26],knuckle=[.17,.19,.16];
+ const wrist=[.105,-.17,.055],palm=[.135,-.105,.035];
+ limb(o,[-.28,-.34,.18],wrist,.073,.041,cloth,12);limb(o,wrist,palm,.042,.037,glove,12);
+ for(let i=0;i<3;i++){const y=-.105-i*.019,x=.165-i*.006;limb(o,[x-.035,y,.053],[x+.022,y,.022],.010,.009,knuckle,8);limb(o,[x+.022,y,.022],[x+.016,y,-.029],.009,.008,glove,8);limb(o,[x+.016,y,-.029],[x-.010,y,-.036],.008,.007,glove,8)}
+ limb(o,[.12,-.075,.05],[.18,-.056,.024],.015,.011,glove,10);
+ limb(o,[.165,-.084,.042],[.20,-.075,.021],.010,.008,knuckle,8);
+ const support=gun===2?.365:gun===0?.53:.49,sy=gun===2?-.075:-.045;
+ const leftWrist=[support-.055,sy-.055,-.075],leftPalm=[support,sy,-.033];
+ limb(o,[-.02,-.35,-.21],leftWrist,.068,.035,cloth,12);limb(o,leftWrist,leftPalm,.036,.034,glove,12);
+ for(let i=0;i<4;i++){let x=support-.035+i*.021;limb(o,[x,sy-.008,-.062],[x,sy+.035,-.057],.009,.008,knuckle,8);limb(o,[x,sy+.035,-.057],[x,sy+.045,-.018],.008,.007,glove,8)}
+ limb(o,[support-.025,sy-.005,.002],[support+.038,sy+.018,.028],.012,.009,glove,10);
  weaponCache.set(gun,o);return o;
 }
 function weapon(o){
  const mesh=weaponBase(o.gun),out=[],reload=o.reloading>0?Math.sin(Math.min(1,o.reloading/2)*Math.PI)*.13:0,recoil=o.flash>0?o.flash*.37:0;
- const cx=.50-recoil,cy=-.235+Math.sin(o.bob||0)*.004-reload-(o.jump||0)*.006,cz=o.scoped?.10:.245,roll=reload*.9,cr=Math.cos(roll),sr=Math.sin(roll);
+ const narrow=(o.aspect||1.6)<1;
+ const cx=(narrow?.62:.50)-recoil,cy=(narrow?-.25:-.205)+Math.sin(o.bob||0)*.004-reload-(o.jump||0)*.006,cz=o.scoped?(narrow?.04:.10):(narrow?.10:.245),roll=reload*.9,cr=Math.cos(roll),sr=Math.sin(roll);
  for(let i=0;i<mesh.length;i+=6){let x=mesh[i],y=mesh[i+1],z=mesh[i+2];let color=mesh.slice(i+3,i+6);if(o.skin&&x>.05&&y>-.06&&Math.max(...color)<.65){let light=.5+Math.max(...color);color=o.skin.map(v=>v*light)}out.push(cx+x,cy+y*cr-z*sr,cz+z*cr+y*sr,...color)}
  if(o.flash>0){const x=cx+(o.gun===0?1.015:o.gun===1?.92:1.05),c=[1,.84,.42];limb(out,[x,cy+.02,cz],[x+.16,cy+.02,cz],.046,.006,c,8)}
  return out;
