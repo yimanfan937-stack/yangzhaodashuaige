@@ -46,15 +46,15 @@ function board(actors,player,target){const tbody=$(target);if(!tbody)return;tbod
 const insets={top:0,left:0,right:0,bottom:0};
 function updateInsets(){try{const style=getComputedStyle(document.documentElement);for(const key of Object.keys(insets))insets[key]=parseFloat(style.getPropertyValue('--safe-'+key))||0}catch{}}
 window.addEventListener('resize',updateInsets);
-function drawHUD(ctx,{actors,player,blocks,width,scale}){
- if(!player)return;const s=scale||1,small=matchMedia('(pointer: coarse)').matches,k=small?.74:1,x=(15+insets.left)*s,y=(78+insets.top)*s,w=126*s*k,h=63*s*k;ctx.save();ctx.fillStyle='#081a24c9';ctx.fillRect(x-5*s,y-5*s,w+10*s,h+10*s);ctx.strokeStyle='#abc5c54d';ctx.lineWidth=s;ctx.strokeRect(x-5*s,y-5*s,w+10*s,h+10*s);
- ctx.fillStyle='#657f86';for(const b of blocks)ctx.fillRect(x+b.x*s*k,y+b.z*s*k,b.w*s*k,b.d*s*k);
- for(const a of actors){if(a.dead||a===player)continue;if(a.team===1&&!a.muzzle)continue;ctx.fillStyle=a.team?'#ef8c74':'#77c7df';ctx.beginPath();ctx.arc(x+a.x*s*k,y+a.z*s*k,1.7*s,0,Math.PI*2);ctx.fill()}
- const px=x+player.x*s*k,py=y+player.z*s*k;ctx.translate(px,py);ctx.rotate(player.yaw);ctx.fillStyle='#fff0c7';ctx.beginPath();ctx.moveTo(4*s,0);ctx.lineTo(-3*s,-3*s);ctx.lineTo(-2*s,0);ctx.lineTo(-3*s,3*s);ctx.closePath();ctx.fill();ctx.restore();
+function drawHUD(ctx,{actors,player,blocks,width,scale,mapWidth=100.8,mapDepth=50.4}){
+ if(!player)return;const s=scale||1,small=matchMedia('(pointer: coarse)').matches,k=small?.74:1,x=(15+insets.left)*s,y=(78+insets.top)*s,w=126*s*k,h=63*s*k,fx=w/mapWidth,fy=h/mapDepth;ctx.save();ctx.fillStyle='#081a24c9';ctx.fillRect(x-5*s,y-5*s,w+10*s,h+10*s);ctx.strokeStyle='#abc5c54d';ctx.lineWidth=s;ctx.strokeRect(x-5*s,y-5*s,w+10*s,h+10*s);
+ ctx.fillStyle='#657f86';for(const b of blocks)ctx.fillRect(x+b.x*fx,y+b.z*fy,b.w*fx,b.d*fy);
+ for(const a of actors){if(a.dead||a===player)continue;if(a.team===1&&!a.muzzle)continue;ctx.fillStyle=a.team?'#ef8c74':'#77c7df';ctx.beginPath();ctx.arc(x+a.x*fx,y+a.z*fy,1.7*s,0,Math.PI*2);ctx.fill()}
+ const px=x+player.x*fx,py=y+player.z*fy;ctx.translate(px,py);ctx.rotate(player.yaw);ctx.fillStyle='#fff0c7';ctx.beginPath();ctx.moveTo(4*s,0);ctx.lineTo(-3*s,-3*s);ctx.lineTo(-2*s,0);ctx.lineTo(-3*s,3*s);ctx.closePath();ctx.fill();ctx.restore();
  if(player.reloading){let total=[2.15,1.85,2.7][player.gun],progress=1-player.reloading/total;ctx.save();ctx.strokeStyle='#f3c988';ctx.lineWidth=2*s;ctx.beginPath();ctx.arc(width/2,ctx.canvas?.height/2||innerHeight*s/2,27*s,-Math.PI/2,-Math.PI/2+Math.max(0,progress)*Math.PI*2);ctx.stroke();ctx.restore()}
 }
 function setupOffline(){
- if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{})});
+ if(!window.DECK_STANDALONE&&'serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'))window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{})});
  let prompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;if($('installApp'))$('installApp').hidden=false});
  if($('installApp'))$('installApp').onclick=async()=>{if(!prompt)return;prompt.prompt();await prompt.userChoice;prompt=null;$('installApp').hidden=true};
  window.addEventListener('appinstalled',()=>{if($('installApp'))$('installApp').hidden=true;toast('游戏已添加到设备')});
@@ -65,9 +65,10 @@ function boot(){
  for(const [id,key] of [['volume','volume'],['sensitivity','sensitivity'],['quality','quality'],['crosshair','crosshair'],['difficulty','difficulty'],['loadout','weapon'],['matchLength','length'],['fov','fov']]){const el=$(id);if(!el)continue;el.value=settings[key];const update=()=>{settings[key]=['volume','sensitivity','weapon','length','fov'].includes(key)?Number(el.value):el.value;persist();if($(id+'Value'))$(id+'Value').textContent=key==='volume'?Math.round(settings[key]*100)+'%':key==='sensitivity'?settings[key].toFixed(1)+'×':settings[key];window.dispatchEvent(new Event('deck-settings'));};el.addEventListener('input',update);update()}
  document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>{const name=button.dataset.tab;document.querySelectorAll('[data-tab]').forEach(b=>{b.classList.toggle('active',b.dataset.tab===name);b.setAttribute('aria-selected',String(b.dataset.tab===name))});document.querySelectorAll('[data-page]').forEach(p=>p.hidden=p.dataset.page!==name)}));
  $('fullscreen').onclick=()=>{const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;if(!request){toast('当前浏览器不支持网页全屏，可直接游玩');return}try{const p=request.call(document.documentElement);if(p?.catch)p.catch(()=>toast('当前浏览器不支持全屏'))}catch{toast('当前浏览器不支持全屏')}};
- $('share').onclick=async()=>{try{await navigator.clipboard.writeText(location.origin+location.pathname);toast('游戏链接已复制')}catch{toast('复制浏览器地址即可邀请朋友试玩')}};
+ $('share').onclick=()=>{$('sharePanel').hidden=false};$('closeShare').onclick=()=>{$('sharePanel').hidden=true};$('copyPublicLink').onclick=async()=>{try{await navigator.clipboard.writeText($('publicLink').value);toast('公开游玩链接已复制')}catch{toast('可长按或选中上方地址进行复制')}};
  $('pauseSettings').onclick=()=>{$('pauseControls').hidden=!$('pauseControls').hidden};
  $('pauseVolume').value=settings.volume;$('pauseVolume').oninput=e=>{settings.volume=Number(e.target.value);if($('volume'))$('volume').value=settings.volume;persist()};
+ $('pauseQuality').value=settings.quality;$('pauseQuality').onchange=e=>{settings.quality=e.target.value;$('quality').value=settings.quality;persist();window.dispatchEvent(new Event('deck-settings'))};
  $('pauseSensitivity').value=settings.sensitivity;$('pauseSensitivity').oninput=e=>{settings.sensitivity=Number(e.target.value);if($('sensitivity'))$('sensitivity').value=settings.sensitivity;persist()};
  sync();
 }

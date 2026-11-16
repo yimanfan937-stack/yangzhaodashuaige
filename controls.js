@@ -1,6 +1,6 @@
 /* Shared multi-pointer controls. Each thumb owns its own captured pointer. */
 (()=>{'use strict';
-window.DeckControls={mount(o){
+window.DeckControls={key(e){const map={KeyW:'w',KeyA:'a',KeyS:'s',KeyD:'d',KeyB:'b',KeyR:'r',Digit1:'1',Digit2:'2',Digit3:'3',Numpad1:'1',Numpad2:'2',Numpad3:'3',ShiftLeft:'shift',ShiftRight:'shift',Space:' ',Tab:'tab',Escape:'escape',ArrowUp:'w',ArrowDown:'s',ArrowLeft:'a',ArrowRight:'d'};return map[e.code]||map[e.key]||String(e.key||'').toLowerCase()},mount(o){
  const {canvas,joy,stick,fireButton:fire,scopeButton:scope}=o;
  let joyID=null,firePoint=null,lookPoint=null;
  const active=()=>o.active(),capture=(el,id)=>{try{el.setPointerCapture(id)}catch{}},release=(el,id)=>{try{if(id!==null&&el.hasPointerCapture(id))el.releasePointerCapture(id)}catch{}};
