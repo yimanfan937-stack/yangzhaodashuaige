@@ -64,10 +64,13 @@ function upper(team,gun){
  for(let i=0;i<o.length;i+=6){let x=o[i],y=o[i+1],z=o[i+2],r=o[i+3],g=o[i+4],b=o[i+5];if(y<1.70&&r+g+b>.55&&r+g+b<1.5){let patch=Math.sin(Math.floor(x*19)*2.3+Math.floor(y*24)*1.7+Math.floor(z*19)*3.1)>.15?.91:1.07;for(let k=3;k<6;k++)o[i+k]*=patch}}
  cache.set(key,o);return o;
 }
+const actorPoses=new WeakMap();
 function soldier(a,out=[]){
  if(a.dead&&a.dead<1.75)return out;
  const suit=a.team?[.51,.39,.29]:[.29,.39,.43],armor=a.team?[.30,.28,.23]:[.15,.23,.27];
- let local=upper(a.team,a.gun).slice(),walk=a.walk||0,motion=a.motion||0,bounce=Math.abs(Math.sin(walk))*.035*motion;
+ let walk=Math.round(((a.walk||0)%TAU)*3)/3,motion=Math.round((a.motion||0)*2)/2,bounce=Math.abs(Math.sin(walk))*.035*motion;
+ const poseKey=[a.team,a.gun,walk,motion,!!a.muzzle,!!a.dead].join('|');let pose=actorPoses.get(a),local;
+ if(pose?.key===poseKey)local=pose.mesh;else{local=upper(a.team,a.gun).slice();
  for(let sign of [-1,1]){
   let stride=Math.sin(walk+(sign<0?Math.PI:0))*.34*motion,lift=Math.max(0,Math.cos(walk+(sign<0?Math.PI:0)))*.13*motion,z=sign*.22;
   const hip=[0,1.04,z],knee=[stride*.5+.07,.58+lift*.4,z],ankle=[stride,.16+lift,z];
@@ -80,6 +83,7 @@ function soldier(a,out=[]){
   cube(local,.25,1.17,sign*.48-.10,.09,.12,.20,armor);
  }
  if(a.muzzle&&!a.dead){cube(local,a.gun===2?1.68:1.48,1.37,-.19,.22,.07,.10,[1,.73,.26]);cube(local,a.gun===2?1.73:1.53,1.34,-.17,.10,.14,.06,[1,.91,.62])}
+ actorPoses.set(a,{key:poseKey,mesh:local});}
  let cs=Math.cos(a.yaw),sn=Math.sin(a.yaw),fall=a.dead?Math.min(1,(2.8-a.dead)/.55)*1.48:0,cf=Math.cos(fall),sf=Math.sin(fall),base=a.y||0;
 
  for(let i=0;i<local.length;i+=6){let x=local[i],y=local[i+1]*1.045+bounce,z=local[i+2]*.88;if(fall){let nx=x*cf-y*sf;y=x*sf+y*cf+.12;x=nx}

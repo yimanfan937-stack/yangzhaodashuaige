@@ -1,5 +1,5 @@
 'use strict';
-const CACHE='deckfire-startup-20261116fix1',VERSION='20261116fix1';
+const CACHE='deckfire-startup-20261116fix2',VERSION='20261116fix2';
 const ASSETS=['./','./index.html','./deck-preview.webp','./icon-192.png','./icon-512.png','./manifest.webmanifest',...['boot.js','style.css','controls.js','app.js','visuals.js','weapon.js','combat-fx.js','game.js','fallback.js'].map(p=>'./'+p+'?v='+VERSION)];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS))));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('deckfire-')&&key!==CACHE).map(key=>caches.delete(key))))));
