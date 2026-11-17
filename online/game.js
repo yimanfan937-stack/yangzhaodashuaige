@@ -6,7 +6,7 @@ function compatibility(reason){
  // A canvas that has acquired WebGL cannot later acquire a 2D context.
  const replacement=canvas.cloneNode(false);canvas.replaceWith(replacement);
  if(window.DeckOfflineFallback){window.DeckOfflineFallback();return}
- const backup=document.createElement('script');backup.src='fallback.js?v=online3';backup.onerror=()=>window.DeckBoot?.fail();document.head.appendChild(backup);
+ const backup=document.createElement('script');backup.src='fallback.js?v=public-access-20261117';backup.onerror=()=>window.DeckBoot?.fail();document.head.appendChild(backup);
 }
 let gl;try{if(new URLSearchParams(location.search).get('renderer')!=='canvas')gl=canvas.getContext('webgl',{alpha:true,antialias:true,powerPreference:'high-performance'})}catch(e){gl=null}
 if(!gl){compatibility();return}
