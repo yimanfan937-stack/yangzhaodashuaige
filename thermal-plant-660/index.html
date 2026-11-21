@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#09121e">
+<meta name="description" content="660 MW 超临界燃煤机组 3D 流程与设备拆解学习模型">
+<title>火力发电厂 3D 智慧模型</title>
+<style>
+:root{color-scheme:dark;--base:#090f19;--panel:#101a28;--border:#25354b;--text:#e4effd;--muted:#9bacbf;--accent:#58e1db;font-family:Inter,"Microsoft YaHei",system-ui,sans-serif;color:var(--text);background:var(--base)}*{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer;color:inherit;background:#152236;border:1px solid var(--border);border-radius:7px}button:hover{border-color:var(--accent);color:var(--accent)}button:focus-visible,select:focus-visible,canvas:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button.active,button[aria-pressed="true"]{background:#11343e;border-color:#2d686f;color:#83f3f0}.top{min-height:76px;display:flex;align-items:center;gap:28px;padding:12px 26px;border-bottom:1px solid var(--border);background:#0e1724}.wordmark{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;display:grid;place-items:center;background:#163942;border:1px solid #276b70;border-radius:11px;color:var(--accent);font-size:30px}.wordmark strong{display:block;font-size:19px;letter-spacing:.06em}.wordmark small,.rating span{display:block;color:var(--muted);font-size:12px;letter-spacing:.1em;margin-top:3px}.type{border-left:1px solid var(--border);padding-left:25px;color:#adc6db;font-size:14px}.type i,.viewtag i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:8px;box-shadow:0 0 10px #48ead9}.rating{margin-left:auto;text-align:right;white-space:nowrap}.rating strong{font-size:26px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}.rating strong small{font-size:14px}main{max-width:1920px;margin:auto;padding:19px;display:grid;grid-template-columns:206px minmax(0,1fr) 292px;gap:16px;align-items:start}.systems,.inspector,.sequence{background:var(--panel);border:1px solid var(--border);border-radius:12px}.systems,.inspector{padding:15px;min-width:0}.asidehead{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:675;font-size:15px}.asidehead small,.kicker{color:#83a3bc;font-family:ui-monospace,monospace;letter-spacing:.09em;font-size:10px;font-weight:550}.systems nav{display:grid;gap:6px;margin-top:15px}.sys{text-align:left;display:flex;align-items:center;gap:9px;padding:9px 8px;font-size:14px;background:transparent;border-color:transparent}.sys b{background:#20344a;color:#a5d4e6;border-radius:5px;display:grid;place-items:center;width:25px;height:25px;font-size:13px}.legend{margin-top:17px;padding-top:15px;border-top:1px solid var(--border)}#legend{display:grid;gap:2px;margin-top:10px}.flow{border-color:transparent;background:transparent;text-align:left;padding:5px 4px;display:flex;align-items:center;gap:8px;font-size:13px;color:#c6d6e6}.flow[aria-pressed="true"]{background:transparent;border-color:transparent;color:#c6d6e6}.flow[aria-pressed="false"]{opacity:.42}.flow span{display:inline-block;width:17px;height:4px;background:var(--color);border-radius:4px;box-shadow:0 0 8px color-mix(in srgb,var(--color),transparent 50%)}.flow em{font-style:normal;margin-left:auto;font-size:11px;color:#a4b7ce}.work{min-width:0}.workhead{display:flex;align-items:end;justify-content:space-between;gap:10px;padding:4px 0 14px}.kicker{color:#74d7d3;font-size:11px}h1{font-size:28px;margin:5px 0;line-height:1.2}p{line-height:1.6}.workhead p{margin:4px 0 0;font-size:14px;color:var(--muted)}.switch{display:flex;gap:5px;flex-shrink:0}.switch button{padding:8px 9px;font-size:13px}.viewport{position:relative;height:clamp(450px,62vh,790px);overflow:hidden;border:1px solid #2c4158;border-radius:12px 12px 0 0;background:radial-gradient(ellipse at 42% 30%,#172c40 0%,#0e1d2d 55%,#0a1420 100%)}canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}.viewtag,.hint{position:absolute;pointer-events:none;color:#adc1d6;background:#0a1724dc;border:1px solid #283d51;border-radius:6px;padding:7px 10px;font-size:12px}.viewtag{top:12px;left:12px}.hint{bottom:11px;left:12px}.hint b{color:#64dfd8;padding:0 4px}.camera{position:absolute;right:11px;bottom:11px;display:grid;gap:4px}.camera button{height:34px;width:34px;font-size:19px;background:#112335}.label{position:absolute;transform:translate(-50%,-100%);background:#0a1829e8;color:#dbeafb;border:1px solid #46617b;white-space:nowrap;border-radius:4px;font-size:11px;padding:3px 6px;z-index:2;box-shadow:0 2px 8px #0008}.label:hover,.label.selected{border-color:#69f1e4;color:#a4f8ef;z-index:4}.label.part{border-color:#438f95;color:#abf7f3}.timeline{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-top:0;border-radius:0 0 12px 12px}.play{height:34px;width:38px;color:#87f0e4;background:#133440;border-color:#2c6267}.timecaption strong,.timecaption small{display:block}.timecaption strong{font-size:13px}.timecaption small{font-size:11px;color:var(--muted)}.speedwrap{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}select{color:var(--text);background:#142437;border:1px solid var(--border);border-radius:6px;padding:5px}.timeline>button:last-child{font-size:13px;padding:6px 8px}.sequence{margin-top:12px;padding:11px 13px}#chain{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;align-items:center}#chain button{font-size:12px;padding:5px 7px}#chain i{font-size:12px;color:#7292ab;font-style:normal}.inspector{min-height:390px}#info{margin-top:14px}.badge{display:inline-block;color:#75e7df;background:#113842;border-radius:4px;padding:3px 7px;font-size:12px}.inspector h2{margin:8px 0 4px;font-size:24px;line-height:1.2}.inspector p{margin:8px 0;color:#aebfd1;font-size:14px}.inspector h3{font-size:15px;margin:15px 0 7px}.inspector dl{margin:12px 0;display:grid;gap:6px}.inspector dl div{display:flex;justify-content:space-between;gap:10px;padding:7px 8px;background:#142236;border-radius:5px;font-size:12px}.inspector dt{color:#a8bcd1}.inspector dd{margin:0;color:#e2f4fd;text-align:right}.inspectButton{width:100%;padding:9px;font-size:14px;background:#11323e;border-color:#2c676b;color:#8df1e8}.equiplist,.parts{display:grid;gap:5px}.equiplist{grid-template-columns:1fr 1fr}.equiplist button,.parts button{padding:7px;text-align:left;font-size:13px;min-width:0}.partnote{padding:7px 9px;background:#102b37;border-left:2px solid var(--accent);border-radius:4px}.range{display:grid;gap:5px;margin-top:12px;font-size:13px;color:#b6c9db}.range input{width:100%;accent-color:#60e4df}footer{max-width:1920px;margin:0 auto;padding:0 20px 17px;display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12px;color:#93a9bf}footer a{color:#86d6db;text-decoration:none}footer a:hover{text-decoration:underline}@media(max-width:1150px){main{grid-template-columns:164px minmax(0,1fr) 238px;gap:10px;padding:12px}.systems,.inspector{padding:11px}.viewport{height:clamp(440px,60vh,740px)}}@media(max-width:900px){main{grid-template-columns:155px minmax(0,1fr)}.inspector{grid-column:2}.workhead{align-items:start}.workhead p{font-size:13px}.viewport{height:clamp(420px,61vh,680px)}}@media(max-width:620px){.top{padding:10px 12px;min-height:63px;gap:8px}.type{display:none}.wordmark strong{font-size:17px}.logo{width:34px;height:34px}.rating strong{font-size:21px}main{display:flex;flex-direction:column;padding:9px;gap:10px}.systems,.work,.inspector{width:100%}.systems nav{display:flex;overflow:auto;margin-top:8px}.sys{white-space:nowrap;padding:5px}.sys b{width:21px;height:21px}.legend{margin-top:7px;padding-top:6px}.legend .asidehead{display:none}#legend{display:flex;overflow:auto;margin:1px 0}.flow{white-space:nowrap;padding:5px}.flow em{display:none}.workhead{padding:2px 0 8px}h1{font-size:23px}.switch button{padding:6px;font-size:12px}.viewport{height:clamp(370px,58vh,500px)}.label{font-size:10px;padding:2px 3px}.inspector{min-height:0}.hint{font-size:10px}.timeline{gap:8px}}
+
+</style>
+</head>
+<body>
+<header class="top"><div class="wordmark"><span class="logo">ϟ</span><span><strong>火力发电厂</strong><small>3D 智慧模型</small></span></div><div class="type"><i></i>超临界燃煤机组</div><div class="rating"><strong>660 <small>MW</small></strong><span>单机额定功率</span></div></header>
+<main>
+<aside class="systems"><div class="asidehead"><span>系统导航</span><small>SYSTEMS</small></div><nav id="systems" aria-label="系统导航"></nav><div class="legend"><div class="asidehead"><span>流股图例</span><small>FLOW KEY</small></div><div id="legend"></div></div></aside>
+<section class="work" aria-label="3D 模型">
+<div class="workhead"><div><span class="kicker">机组全流程 · 交互教学</span><h1 id="viewTitle">全厂总览</h1><p id="viewSub">点击设备查看结构，沿彩色管线追踪物质与能量。</p></div><div class="switch" aria-label="视图模式"><button id="whole" class="active">全厂视图</button><button id="detail">设备视图</button></div></div>
+<div class="viewport" id="viewport"><canvas id="scene" tabindex="0" aria-label="互动 3D 场景，使用方向键旋转，加减键缩放"></canvas><div id="labels"></div>
+<div class="viewtag"><i></i><span id="viewTag">全厂 · 3D 场景</span></div>
+<div class="camera"><button id="plus" title="放大" aria-label="放大">+</button><button id="minus" title="缩小" aria-label="缩小">−</button><button id="reset" title="重置视角" aria-label="重置视角">⟲</button></div>
+<div class="hint">拖动旋转 <b>·</b> 滚轮 / 双指缩放 <b>·</b> 点击选择</div></div>
+<div class="timeline"><button id="play" class="play" aria-label="暂停流动动画">Ⅱ</button><div class="timecaption"><strong>流动动画</strong><small id="playState">播放中</small></div><div class="speedwrap"><label for="speed">速度</label><select id="speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div><button id="labelToggle" aria-pressed="true">设备标签</button></div>
+<section class="sequence"><div class="asidehead"><span>流程导览</span><small>PROCESS</small></div><div id="chain"></div></section>
+</section>
+<aside class="inspector"><div class="asidehead"><span>学习面板</span><small>INSPECTOR</small></div><div id="info" aria-live="polite"></div></aside>
+</main>
+<footer><span>660 MW 超临界燃煤机组教学模型 · 布置、尺寸及动画速度为示意</span><a href="https://openjicareport.jica.go.jp/pdf/12149506_02.pdf" target="_blank" rel="noopener">660 MW 参考配置</a><a href="https://netl.doe.gov/projects/files/CostandPerformanceBaselineFossilEnergyPlantsVolume1BituminousCoalNaturalGastoElectricity_052125.pdf" target="_blank" rel="noopener">NETL 流程参考</a></footer>
+<script>
+"use strict";
+const flows = {
+ coal:["原煤 / 煤粉","#ffd070","燃料"], air:["一 / 二次风","#91ed91","空气"], gas:["烟气","#f7906c","治理"],
+ steam:["主蒸汽 / 热再热","#ff698b","高温"], reheat:["冷再热 / 抽汽 / 排汽","#c7a3ff","蒸汽"],
+ water:["凝结水 / 给水","#4ac8ff","汽水侧"], cool:["循环冷却水","#44ead1","冷端"],
+ ash:["灰渣 / 石膏","#d8be9a","副产物"], power:["轴功 / 电能","#ffe560","能量"], heat:["传热","#ff9a41","能量"]
+};
+const plant = {};
+function unit(id,name,group,pos,form,ports,note,parts,stats=[]){
+ plant[id]={id,name,group,pos,form,ports,note,parts,stats};
+}
+const p=(name,note,kind,x,y,z,a,b,c,color)=>({name,note,kind,xyz:[x,y,z],size:[a,b,c],color});
+unit("yard","储煤场","fuel",[-48,0,8],"yard",["原煤","输煤皮带"],"缓冲来煤与机组连续耗煤之间的差异。堆取料后，原煤进入输煤系统。",[
+ p("煤堆","堆煤作为燃料库存。","pile",0,1,0,6,3,3,"#606772"),p("棚架","封闭式煤棚可减少扬尘。","roof",0,4,0,9,2,6,"#5f829b"),p("取料输送段","取出的煤通过皮带送往原煤仓。","belt",0,.6,2.5,8,1,1,"#ba9656")
+]);
+unit("bunker","输煤与原煤仓","fuel",[-33,0,8],"bunker",["输煤皮带","给煤机 / 磨煤机"],"皮带将原煤送入煤仓，给煤机连续计量并供煤。",[
+ p("输送皮带","将原煤连续送至仓顶。","belt",-1,6,0,9,1,2,"#bb9557"),p("仓体","短时储存原煤，稳定磨煤机入口供煤。","cyl",0,3.9,0,2.1,3.2,0,"#62839a"),p("料斗","锥形收口将煤导入给煤机。","cone",0,1.5,0,2.1,1.7,.6,"#9bafbf"),p("给煤机","计量原煤质量流量并调节出煤量。","belt",0,.3,0,4,1,1.5,"#d1a66a")
+]);
+unit("mill","磨煤机","fuel",[-19,0,8],"mill",["原煤、热一次风","一次风携带的煤粉"],"磨辊在磨盘上碾磨原煤。热一次风干燥煤粉并将合格细粉送往燃烧器，粗粉返回继续磨制。",[
+ p("外壳","包围研磨区，并形成气固两相流通道。","shell",0,2.8,0,3,5.2,0,"#63869b"),p("磨盘","电机经减速机驱动磨盘转动。","cyl",0,1.1,0,2.6,.55,0,"#cfac70"),p("磨辊","磨辊向磨盘上的煤层施压。","rollers",0,2,0,2.5,1.2,0,"#c7d5de"),p("分离器","细粉随气流离开，粗粉落回磨盘。","cone",0,4.1,0,2.4,1.25,1.1,"#4ba5a7"),p("一次风入口","热风在磨内干燥原煤并托举细粉。","pipe",-3,1.65,0,2.5,.45,0,"#8bd582")
+]);
+unit("fans","一次风机 / 送风机","fuel",[-24,0,-6],"fans",["环境空气","空预器空气侧"],"一次风负责干燥与输送煤粉，二次风经风箱进入炉膛并为燃烧供氧。图中并列展示两套风机。",[
+ p("一次风机叶轮","克服一次风和煤粉输送系统阻力。","fan",-2,1.9,0,1.5,0,0,"#7fd2a3"),p("送风机叶轮","提供通过空预器、风道与燃烧器的二次风。","fan",2,1.9,0,1.5,0,0,"#53bfbf"),p("出口风道","将两股冷风分别引向空预器。","duct",0,3.7,0,8,1,1.3,"#7496a9")
+]);
+unit("boiler","直流锅炉","fuel",[-3,0,0],"boiler",["煤粉、空气、给水、冷再热蒸汽","主蒸汽、热再热蒸汽、烟气、底渣"],"煤粉在炉膛燃烧。给水依次通过省煤器、水冷壁和过热器。高压缸排汽在独立的再热器中吸热后进入中压缸。",[
+ p("炉膛与水冷壁","膜式水冷壁围成炉膛，管内工质吸收炉内辐射热。","walls",-1,4.2,0,4.6,7.4,4.8,"#417f9e"),
+ p("燃烧器","一次风煤粉与二次风在燃烧区混合，释放燃料化学能。","burners",-1,3,2.55,4,1.8,1.6,"#f59646"),
+ p("过热器","吸收烟气热量，将工质加热至主蒸汽设计温度。","coils",-.9,8.7,0,4.3,1.2,3.7,"#ff7998"),
+ p("再热器","对高压缸排汽再加热，随后将蒸汽送往中压缸。","coils",2.9,6.9,0,3.1,1.3,3.3,"#d09cff"),
+ p("省煤器","回收尾部烟气余热，提高进入水冷壁的给水温度。","coils",2.9,4.5,0,3.1,1.4,3.3,"#4cc0f0"),
+ p("炉底灰斗","承接炉膛底部落下的粗渣并送往排渣设备。","hopper",-1,.85,0,4.5,1.6,4.4,"#bfaa87"),
+ p("炉墙与钢架","钢架支承炉体和附属设备，炉墙围护烟气通道。","frame",.5,5.2,0,8.3,10.4,5.8,"#9cb8cb")
+ ],[["设计参考主汽","24.2 MPa / 566 °C"],["设计参考再热热端","593 °C"],["锅炉型式","超临界直流 · 一次再热"]]);
+unit("scr","SCR 脱硝","gas",[12,0,-15],"scr",["含 NOₓ 烟气、氨","脱硝后烟气"],"喷氨与烟气混合后通过催化剂，氮氧化物主要转化为氮气和水。",[
+ p("喷氨格栅","将氨分布到烟道截面并与烟气混合。","coils",0,5.2,0,5,.8,4,"#a3de84"),p("催化剂模块","蜂窝通道提供反应表面。","plates",0,3,0,5,2.7,4,"#d0bd95"),p("反应器壳体","封闭烟气通道并支承催化剂层。","frame",0,3.8,0,6,6.5,5,"#7c9aae")
+]);
+unit("aph","空气预热器","gas",[0,0,-25],"aph",["高温烟气、冷一 / 二次风","降温烟气、热一 / 二次风"],"回转式空预器的换热元件交替经过烟气区和空气区，回收排烟余热。",[
+ p("回转蓄热转子","波纹板交替吸收烟气热量和加热空气。","rotor",0,2.6,0,3.2,2.3,0,"#a2c6cc"),p("扇形分隔板","将烟气与一、二次风通道分开。","plates",0,4.3,0,5.5,.8,4,"#d1a764"),p("固定外壳","包围转子并连接空气和烟气风道。","shell",0,2.7,0,3.65,5.2,0,"#68899e")
+]);
+unit("dust","静电除尘器","gas",[19,0,-29],"dust",["含飞灰烟气","烟气、飞灰"],"放电极使粉尘荷电，粉尘迁移至集尘极并经振打落入灰斗。",[
+ p("放电极","电晕放电使通过的粉尘颗粒带电。","coils",0,3.6,0,5,3.6,4,"#dda27f"),p("集尘极板","荷电颗粒在电场中移向极板。","plates",0,3.8,0,5.6,4.3,4,"#94b8d1"),p("灰斗","汇集振打落下的飞灰。","hopper",0,1,0,5.8,2,4.8,"#c5ad89"),p("外壳与支架","在封闭空间内组织烟气流动。","frame",0,3,0,6.8,6,5.6,"#7e9bad")
+]);
+unit("idfan","引风机","gas",[32,0,-29],"fans",["除尘后烟气","脱硫入口烟气"],"驱动烟气通过锅炉尾部及后续处理设备，并与送风系统配合维持炉膛压力。",[
+ p("叶轮","将轴功传递给烟气以克服沿程阻力。","fan",0,2.2,0,2.4,0,0,"#e1ae93"),p("蜗壳","汇集叶轮出口烟气并引向排气管。","shell",0,2.4,0,2.8,2,0,"#8ca2b9"),p("电机","驱动引风机叶轮。","machine",3,1.25,0,2,1.5,1.5,"#6ab2b7")
+]);
+unit("fgd","湿法脱硫塔","gas",[45,0,-25],"fgd",["烟气、石灰石浆液、氧化空气","净烟气、石膏浆液"],"石灰石浆液喷淋吸收 SO₂，经氧化形成石膏。净烟气经过除雾后送往烟囱。",[
+ p("吸收塔壳体","围成气液接触空间并连接烟道。","shell",0,4,0,3.1,8.2,0,"#789ead"),p("除雾器","净烟气排出前捕集夹带的浆液液滴。","plates",0,6.9,0,4.7,.7,4,"#9fcbcb"),p("喷淋层","使石灰石浆液与向上流动的烟气充分接触。","coils",0,5,0,5,1.5,4,"#7bd9b5"),p("浆液池","浆液循环使用，氧化形成石膏浆液。","cyl",0,1.5,0,2.65,2.2,0,"#b3a17b")
+]);
+unit("stack","烟囱","gas",[55,0,-14],"stack",["净烟气","大气"],"处理后的烟气经内筒排至大气，排口监测用于记录烟气排放。",[
+ p("外筒","支承并保护内部烟道。","shell",0,6,0,2.3,12,0,"#c29983"),p("排烟内筒","将脱硫后的烟气输送至高处出口。","cyl",0,6,0,1.35,12,0,"#819cad"),p("监测截面","布置采样和流速测量位置。","pipe",0,3.4,0,5,.22,0,"#faab79")
+]);
+unit("turbine","汽轮机组","steam",[20,0,12],"turbine",["主蒸汽、热再热蒸汽","轴功、冷再热蒸汽、抽汽、低压排汽"],"主蒸汽在高压缸膨胀后返回锅炉再热。热再热蒸汽在中、低压缸继续膨胀，轴功传给发电机。",[
+ p("汽缸与轴承座","汽缸承压、导流，轴承支承转子。","turbShell",0,2,0,12,2.7,3.4,"#6387a5"),
+ p("高压缸叶级","接收主蒸汽，排汽返回锅炉再热器。","blades",-4.35,1.9,0,2.7,1.3,0,"#ff789e"),
+ p("中压缸叶级","接收热再热蒸汽，继续膨胀做功。","blades",-.95,1.9,0,3.2,1.75,0,"#b49de8"),
+ p("低压缸叶级","在末级获得更大流通面积，排汽进入凝汽器。","blades",3.5,1.9,0,5,2.55,0,"#68bde4"),
+ p("贯穿转子","高、中、低压缸共轴传递扭矩。","pipe",0,1.9,0,14,.28,0,"#f8d58b")
+ ],[["型式","一次再热凝汽式"],["额定转速参考","3,000 r/min"]]);
+unit("gen","发电机","power",[37,0,12],"gen",["汽轮机轴功","电能"],"汽轮机带动励磁转子旋转。旋转磁场在定子绕组中感应出三相电压。",[
+ p("机座","支承定子与端盖，保护内部部件。","frame",0,2.3,0,8,4.7,5,"#6e8ca9"),p("定子铁芯与绕组","槽中的三相绕组产生感应电压。","rings",0,2.4,0,5,2.1,0,"#d3a279"),p("励磁转子","通入励磁电流形成随轴旋转的磁场。","pipe",0,2.4,0,9,1.1,0,"#7ed1d6"),p("出线端","将三相电能导向主变压器。","coils",2.8,4.65,0,2,1.15,2.8,"#ffe48d")
+ ],[["单机额定功率","660 MW"],["额定频率参考","50 Hz"]]);
+unit("grid","主变压器 / 电网","power",[52,0,16],"grid",["发电机电能","升压送出"],"主变压器将发电机端电压升高，将电功率经开关设备送入电网。",[
+ p("铁芯","为交变磁通提供低磁阻通路。","frame",0,2.3,0,5,4.1,3,"#819cb4"),p("高低压绕组","通过磁耦合传递电能，匝数比决定电压比。","coils",0,2.7,0,4.2,3,3,"#edb96e"),p("绝缘套管","让高压导体穿过接地箱体。","bushings",0,4.2,0,5,2.6,2,"#d1d9d7"),p("油箱与散热片","油提供绝缘与散热，外侧冷却片向环境放热。","plates",0,1.8,0,6,3.6,4,"#81a9ac")
+]);
+unit("cond","凝汽器","steam",[21,0,24],"cond",["低压缸排汽、冷循环水","凝结水、热循环水"],"汽轮机排汽在管外凝结，热量通过管壁传给管内循环水。汽水回路与冷却水回路独立。",[
+ p("排汽喉部","引导低压缸排汽进入凝汽器壳侧。","hopper",0,4.8,0,6,2.4,4,"#aaa2ce"),p("循环水管束","冷却水在管内流过，排汽在管外凝结。","tubes",0,2.6,0,6.8,2.8,3.3,"#4cd9d4"),p("进出水水室","将冷却水分配到管束并收集出口循环水。","plates",0,2.6,0,8.4,3.5,3.8,"#5ba9bc"),p("热井","汇集凝结水，由凝结水泵送往低压加热器。","duct",0,.6,0,7.4,1,3.7,"#56bafa")
+]);
+unit("lph","低压加热器","steam",[8,0,27],"heater",["凝结水、中低压抽汽","升温凝结水"],"抽汽在壳侧凝结，隔着管壁加热凝结水。此处将多级低压加热器合并表示。",[
+ p("外壳","容纳加热蒸汽与疏水。","shellX",0,2,0,2.4,5.2,0,"#7899b7"),p("U 形换热管束","凝结水在管内吸收抽汽放出的热量。","utubes",0,2.3,0,5,2.2,2.4,"#58c6f6"),p("疏水区","抽汽凝结后从疏水口排往相应级别。","duct",0,.6,0,5,.8,2.5,"#998cba")
+]);
+unit("dea","除氧器","steam",[-3,0,27],"dea",["升温凝结水、加热抽汽","除氧给水、排气"],"利用蒸汽加热并驱除给水中溶解的气体。除氧水箱为给水泵提供稳定水源。",[
+ p("喷淋装置","将入水分散成液滴，强化与蒸汽的接触。","coils",0,4.4,0,5,.8,2.5,"#77c9f1"),p("除氧段","蒸汽与水直接接触，释放溶解氧。","plates",0,3.35,0,5.2,1.5,3,"#c2a6e4"),p("给水箱","储存已除氧给水并向给水泵供水。","pipe",0,1.25,0,7,1.16,0,"#6fa7ba")
+]);
+unit("pump","给水泵","steam",[-16,0,23],"pump",["除氧给水、驱动功","高压给水"],"给水泵克服锅炉水汽侧压力及阻力，将除氧水加压后送往高压加热器。",[
+ p("多级叶轮","各级叶轮依次向给水输入机械能。","blades",0,1.8,0,5,1.6,0,"#62d2fe"),p("导叶与泵壳","导叶将部分动能转化为压力能。","rings",0,1.8,0,5.5,2.1,0,"#799caf"),p("驱动轴","将驱动装置的机械功传给叶轮。","pipe",0,1.8,0,7.5,.24,0,"#e0b275")
+]);
+unit("hph","高压加热器","steam",[-17,0,34],"heater",["高压给水、高压抽汽","加热后的锅炉给水"],"采用较高压力的抽汽继续预热给水，减少锅炉中由燃料提供的给水升温热量。",[
+ p("承压外壳","容纳抽汽、凝结液及换热组件。","shellX",0,2,0,2.4,5.2,0,"#6e95b1"),p("高压给水管束","高压给水流过管内，吸收抽汽凝结放热。","utubes",0,2.2,0,5,2.25,2.5,"#6bc8f0"),p("疏水汇集区","回收凝结后的抽汽疏水。","duct",0,.65,0,5,.8,2.5,"#b18bc6")
+]);
+unit("tower","自然通风冷却塔","cool",[42,0,34],"tower",["热循环水、空气、补水","冷循环水、散热"],"热循环水经配水后通过填料，与上升空气换热并发生部分蒸发。冷却后的水由循环水泵送回凝汽器。",[
+ p("双曲线塔筒","塔内外空气密度差形成自然通风抽力。","tower",0,5.6,0,4.4,10.5,0,"#839db0"),p("配水喷淋层","将热循环水均匀分配至填料。","coils",0,3.1,0,6,.75,5.5,"#6febd6"),p("填料","扩大空气与水的接触面积。","plates",0,2.3,0,6.3,1.1,6.3,"#89b9ac"),p("集水池","收集冷却水，通过泵送回凝汽器。","cyl",0,.7,0,4.6,.8,0,"#41c7bd")
+]);
+unit("ash","灰渣收集","ash",[-27,0,20],"ash",["炉底渣 / 除尘飞灰","分别贮存与外运"],"炉底渣与除尘飞灰来源不同，在图中连到同一管理区，实际分别收集贮存。",[
+ p("底渣仓","储存从炉底排出的粗颗粒灰渣。","hopper",-2,2,0,3.1,3.8,3.1,"#a59177"),p("飞灰仓","接收除尘器灰斗经输送管道送来的飞灰。","cyl",2,2.5,0,1.75,4.8,0,"#b2a08a")
+]);
+unit("gypsum","石膏脱水","ash",[53,0,-34],"ash",["脱硫石膏浆液","石膏滤饼"],"石膏浆液经浓缩和脱水形成石膏滤饼，滤液按工艺回用或进入水处理。",[
+ p("浆液箱","暂存来自吸收塔的石膏浆液。","cyl",-2,2,0,1.6,3.6,0,"#a89e84"),p("真空带式过滤机","在滤布上分离石膏滤饼与滤液。","belt",1.55,.7,0,4.3,1,2.3,"#d6c29c")
+]);
+unit("cep","凝结水泵","steam",[15,0,31],"pump",["凝汽器热井凝结水","低压加热器进水"],"将凝汽器热井内的凝结水送入低压回热系统。",[
+ p("首级叶轮","在低吸入压力下为凝结水提供初级扬程。","fan",0,1.45,0,1.25,0,0,"#6ed5f2"),p("泵筒与导叶","将凝结水引向后续各级并回收动能。","rings",0,1.45,0,4.1,1.7,0,"#88a4b7"),p("驱动轴","把电机转矩传递给泵内叶轮。","pipe",0,1.45,0,5.4,.23,0,"#e5bb77")
+]);
+unit("cwp","循环水泵","cool",[34,0,34],"pump",["冷却塔集水池循环水","凝汽器管侧进水"],"由集水池取水并克服管路及凝汽器管束阻力，维持冷却水循环。",[
+ p("叶轮","向冷循环水传递机械能。","fan",0,1.55,0,1.35,0,0,"#66e4cb"),p("泵体","为循环水提供流动通道。","rings",0,1.55,0,3.8,1.68,0,"#7db2ba"),p("驱动轴","传递电机扭矩。","pipe",0,1.55,0,5.35,.26,0,"#ddbd82")
+]);
+const systems=[
+ ["all","▦","全厂总览","沿厂区管线查看各系统的连接。",["yard","boiler","turbine","gen","grid"]],
+ ["fuel","◈","燃料与燃烧","煤经输送、磨制后进入炉膛。一、二次风分别承担输粉和助燃。",["yard","bunker","mill","fans","boiler"]],
+ ["steam","≈","汽水与回热","一次再热与抽汽回热构成闭合汽水循环。",["boiler","turbine","cond","cep","lph","dea","pump","hph","boiler"]],
+ ["gas","≋","烟气净化","烟气经过脱硝、空预器、除尘和脱硫后进入烟囱。",["boiler","scr","aph","dust","idfan","fgd","stack"]],
+ ["cool","◌","冷端循环","循环水在凝汽器吸热，经冷却塔放热后返回。",["cond","tower","cwp","cond"]],
+ ["power","ϟ","发电与送出","煤的化学能经燃烧转化为热能，蒸汽膨胀输出轴功，再转化为电能。",["boiler","turbine","gen","grid"]],
+ ["ash","◇","灰渣与石膏","底渣、飞灰与石膏分别收集处理。",["boiler","dust","ash","fgd","gypsum"]]
+];
+const paths=[];
+function stream(kind,systems,from,to,at,bt,way=[]){
+ const point=(id,offset)=>plant[id].pos.map((v,i)=>v+offset[i]);
+ paths.push({kind,systems,from,to,points:[point(from,at),...way,point(to,bt)]});
+}
+stream("coal","fuel","yard","bunker",[4,2,0],[-1,5.5,0],[[-40,3.5,8]]);
+stream("coal","fuel","bunker","mill",[2,1,0],[-2,2,0],[[-26,1.3,8]]);
+stream("coal","fuel","mill","boiler",[1,3,0],[-3,6,3],[[-14,4,8],[-14,6,4]]);
+stream("air","fuel","fans","aph",[0,2,-1],[-2,2,0],[[-24,2,-19],[-9,2,-19],[-9,2,-25]]);
+stream("air","fuel","aph","mill",[-2,3,-1],[0,1.3,-1],[[-15,3,-26],[-15,1.3,4],[-19,1.3,4]]);
+stream("air","fuel","aph","boiler",[1,4,1],[-1,4,-3],[[1,4,-19],[-8,4,-19],[-8,4,-5]]);
+stream("gas","gas","boiler","scr",[3,14,-1],[0,6.3,1],[[8,14,-2],[8,8,-12],[12,8,-14]]);
+stream("gas","gas","scr","aph",[-2,3,-1],[1,3,1],[[8,3,-17],[8,3,-23]]);
+stream("gas","gas","aph","dust",[2,1.5,-2],[-4,3,0],[[6,1.5,-27],[11,3,-29]]);
+stream("gas","gas","dust","idfan",[4,3,0],[-2,2.6,0],[[26,3,-29]]);
+stream("gas","gas","idfan","fgd",[2,2.6,0],[-2,2,-1],[[37,2.6,-29],[39,2,-26]]);
+stream("gas","gas","fgd","stack",[2,8,1],[-.8,5,-1],[[51,8,-24],[54.2,5,-21]]);
+stream("steam","steam power","boiler","turbine",[0,13.3,3],[-6,2.4,0],[[1,13.3,5],[9,10,5],[9,6,12],[14,6,12]]);
+stream("reheat","steam","turbine","boiler",[-4,2.3,-1],[1,9,2],[[16,4.3,8],[7,4.3,8],[7,9,2]]);
+stream("steam","steam","boiler","turbine",[2,10,1],[-1,2.5,-1],[[6,10,1],[13,8,2],[19,5,6]]);
+stream("reheat","steam","turbine","cond",[5,1.3,1],[2,3.4,-1],[[25,1.3,18],[25,3.4,22]]);
+stream("reheat","steam","turbine","lph",[4,2.3,1],[.5,2.3,-1],[[24,4,16],[9,4,19],[9,2.3,24]]);
+stream("reheat","steam","turbine","dea",[1,2.4,1],[1,3.3,-1],[[21,3.4,16],[-2,3.4,22]]);
+stream("reheat","steam","turbine","hph",[-4,2.4,1],[0,2.6,1],[[16,3.3,15],[16,3.3,36],[-17,3.3,36]]);
+stream("water","steam","cond","cep",[-3,1,1],[2,1.3,-1],[[18,1,29]]);
+stream("water","steam","cep","lph",[-2,1.3,0],[3,1.4,0],[[11,1.3,31],[11,1.4,27]]);
+stream("water","steam","lph","dea",[-3,1.4,0],[3,1.3,0]);
+stream("water","steam","dea","pump",[-3,1.3,0],[2,1.2,0],[[-9,1.2,27],[-14,1.2,25]]);
+stream("water","steam","pump","hph",[-1,1.2,1],[0,1.25,-1],[[-17,1.2,29]]);
+stream("water","steam","hph","boiler",[-3,1.25,0],[-3,8,1],[[-23,1.25,34],[-23,1.25,13],[-11,1.25,13],[-11,8,3]]);
+stream("cool","cool","cond","tower",[4,1.3,1],[-3,2.8,-1],[[32,1.3,25],[39,1.3,25],[39,2.8,30]]);
+stream("cool","cool","tower","cwp",[-4,1,1],[1.7,1.2,0],[[37,1,35]]);
+stream("cool","cool","cwp","cond",[-2,1.2,0],[4,.9,2],[[29,1.2,33],[29,.9,26]]);
+stream("power","power","turbine","gen",[6,1.8,0],[-4,1.8,0]);
+stream("power","power","gen","grid",[4,3,0],[-2,4,0],[[45,5,12],[48,5,16]]);
+stream("heat","power","boiler","boiler",[-2,3,3],[-2,12,3],[[-2,7,3.2]]);
+stream("heat","cool power","tower","tower",[0,5,0],[0,15,0]);
+stream("ash","ash","boiler","ash",[-2,.7,3],[2,1.2,-1],[[-5,.7,16],[-20,.7,16],[-25,1.2,17]]);
+stream("ash","ash","dust","ash",[0,.45,0],[-1,3,0],[[19,.35,-37],[-28,.35,-37],[-28,.35,13],[-28,3,17]]);
+stream("ash","ash","fgd","gypsum",[1,1.1,-1],[-2,1.5,0],[[48,1.1,-28],[48,1.5,-34]]);
+
+</script>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const canvas = $("scene"), ctx = canvas.getContext("2d");
+const visible = Object.fromEntries(Object.keys(flows).map(key=>[key,true]));
+const view = {system:"all",id:"boiler",mode:"whole",picked:false,part:0,spread:.7,labels:true,playing:!matchMedia("(prefers-reduced-motion: reduce)").matches,speed:1};
+const camera = {yaw:.53,pitch:.60,zoom:1};
+let mesh=[], hit=[], marks=[], width=1,height=1, size=1, clock=0, last=0, dirty=true;
+let items=[], center=[0,0,0];
+const tau=2*Math.PI;
+const steel="#819bb1", blue="#50849f", dark="#39576e", silver="#a6bacd";
+const add=(a,b)=>a.map((v,i)=>v+b[i]);
+const mix=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t);
+const shadeCache=new Map();
+function shade(hex,k){
+ const key=hex+String(k);
+ if(!shadeCache.has(key)){
+  const v=parseInt(hex.slice(1),16);
+  shadeCache.set(key,"rgb("+[v>>16,(v>>8)&255,v&255].map(n=>Math.round(Math.min(255,n*k))).join(",")+")");
+ }
+ return shadeCache.get(key);
+}
+function face(owner,points,color,k=1,alpha=1,line=false){
+ mesh.push({owner,points,color:shade(color,k),alpha,line});
+}
+function box(owner,[x,y,z],[a,b,c],color,alpha=1){
+ const X=a/2,Y=b/2,Z=c/2;
+ const pts=[[-X,-Y,-Z],[X,-Y,-Z],[X,-Y,Z],[-X,-Y,Z],[-X,Y,-Z],[X,Y,-Z],[X,Y,Z],[-X,Y,Z]].map(v=>add(v,[x,y,z]));
+ const faces=[[0,1,2,3,.52],[4,7,6,5,1.18],[0,4,5,1,.84],[1,5,6,2,.63],[2,6,7,3,.91],[3,7,4,0,.74]];
+ for(const [i,j,k,l,f] of faces) face(owner,[pts[i],pts[j],pts[k],pts[l]],color,f,alpha);
+}
+function profile(owner,at,rings,color,axis="y",cap=true,steps=16,alpha=1){
+ const point=(axisValue,r,t)=>{
+  const u=Math.cos(t)*r,v=Math.sin(t)*r;
+  return add(at,axis==="x"?[axisValue,u,v]:axis==="z"?[u,v,axisValue]:[u,axisValue,v]);
+ };
+ const row=rings.map(([y,r])=>Array.from({length:steps},(_,i)=>point(y,r,i*tau/steps)));
+ for(let j=0;j<row.length-1;j++)for(let i=0;i<steps;i++){
+  const next=(i+1)%steps;
+  const angle=(i+.5)*tau/steps;
+  face(owner,[row[j][i],row[j][next],row[j+1][next],row[j+1][i]],color,Math.round((.87+.27*Math.cos(angle-(axis==="x"?-.52:2.3)))*20)/20,alpha);
+ }
+ if(cap){
+  face(owner,row[0],color,.63,alpha);
+  face(owner,row.at(-1),color,1.13,alpha);
+ }
+}
+function cyl(owner,at,r,h,color,axis="y",other=r,steps=16,cap=true,alpha=1){
+ profile(owner,at,[[-h/2,r],[h/2,other]],color,axis,cap,steps,alpha);
+}
+function line(owner,points,color,k=1,alpha=1){face(owner,points,color,k,alpha,true);}
+function beam(owner,a,b,th,color){
+ const center=mix(a,b,.5), dim=a.map((v,i)=>Math.max(th,Math.abs(v-b[i])+th));
+ box(owner,center,dim,color);
+}
+function frame(owner,[x,y,z],[a,b,c],color,th=.13){
+ const x0=x-a/2,x1=x+a/2,y0=y-b/2,y1=y+b/2,z0=z-c/2,z1=z+c/2;
+ for(const X of [x0,x1])for(const Z of [z0,z1])beam(owner,[X,y0,Z],[X,y1,Z],th,color);
+ for(const y of [y0,(y0+y1)/2,y1]){
+  for(const X of [x0,x1])beam(owner,[X,y,z0],[X,y,z1],th,color);
+  for(const Z of [z0,z1])beam(owner,[x0,y,Z],[x1,y,Z],th,color);
+ }
+}
+function hopper(owner,at,a,b,c,color){
+ const [x,y,z]=at;
+ const upper=[[-a/2,b/2,-c/2],[a/2,b/2,-c/2],[a/2,b/2,c/2],[-a/2,b/2,c/2]];
+ const lower=upper.map(([u,v,w])=>[u*.24,-v,w*.24]);
+ for(let i=0;i<4;i++){
+  const j=(i+1)%4;
+  face(owner,[upper[i],upper[j],lower[j],lower[i]].map(v=>add(v,[x,y,z])),color,[.76,.63,.91,.8][i]);
+ }
+ face(owner,upper.map(v=>add(v,[x,y,z])),color,1.09);
+}
+function roof(owner,at,a,b,c,color){
+ const pts=[[-a/2,0,-c/2],[a/2,0,-c/2],[a/2,0,c/2],[-a/2,0,c/2],[-a/2,b,0],[a/2,b,0]].map(v=>add(at,v));
+ for(const [indices,k] of [[[0,1,5,4],.84],[[3,4,5,2],1.11],[[0,4,3],.79],[[1,2,5],.66]])face(owner,indices.map(i=>pts[i]),color,k);
+ for(let i=0;i<9;i++){
+  const x=-a/2+i*a/8;
+  line(owner,[[x,0,-c/2],[x,b,0],[x,0,c/2]].map(v=>add(v,at)),color,1.24,.62);
+ }
+}
+function tower(owner,at,r,h,color,detail=false){
+ const rows=[[0,1],[.08,.95],[.25,.75],[.45,.6],[.62,.55],[.76,.57],[.91,.64],[1,.7]];
+ profile(owner,at,rows.map(([t,k])=>[(t-.5)*h,k*r]),color,"y",false,24,detail?.82:1);
+ for(const [t,k] of [rows[0],rows.at(-1)])cyl(owner,add(at,[0,(t-.5)*h,0]),r*(k+.024),h*.023,silver,"y",r*(k+.024),24,false);
+}
+function pedestal(owner,at,a,c){
+ box(owner,add(at,[0,-.13,0]),[a,.42,c],"#3e556a");
+ box(owner,add(at,[0,.12,0]),[a-.35,.15,c-.35],"#60798e");
+}
+function rotorBlades(owner,at,a,r,color,count=5){
+ cyl(owner,at,r*.22,a+.45,silver,"x");
+ for(let j=0;j<count;j++){
+  const u=count===1?0:a*(j/(count-1)-.5)*.88,rr=r*(.57+.43*j/Math.max(1,count-1));
+  cyl(owner,add(at,[u,0,0]),rr*.54,.14,color,"x",rr*.54,12);
+  for(let i=0;i<12;i++){
+   const t=i*tau/12;
+   const pt=(dx,v,dt)=>add(at,[u+dx,Math.cos(t+dt)*v,Math.sin(t+dt)*v]);
+   face(owner,[pt(-.1,rr*.49,0),pt(.16,rr*.52,.12),pt(.21,rr,.17),pt(-.13,rr*.94,.03)],color,i%2?.89:1.23);
+  }
+ }
+}
+function detailed(owner,part,at){
+ const [a,b,c]=part.size,k=part.color,[x,y,z]=at;
+ switch(part.kind){
+  case "cyl":cyl(owner,at,a,b,k);break;
+  case "shell":case "shellX":cyl(owner,at,a,b,k,part.kind==="shellX"?"x":"y",a,18,false,.58);break;
+  case "cone":cyl(owner,at,c,b,k,"y",a);break;
+  case "pile":cyl(owner,at,a*.56,b,k,"y",.2,10);break;
+  case "roof":roof(owner,at,a,b,c,k);break;
+  case "hopper":hopper(owner,at,a,b,c,k);break;
+  case "duct":case "belt":box(owner,at,[a,b,c],k);for(let i=0;i<6;i++)box(owner,add(at,[a*(i/5-.5),b/2+.04,0]),[.13,.1,c],silver);break;
+  case "frame":frame(owner,at,[a,b,c],k,.23);break;
+  case "pipe":case "machine":cyl(owner,at,b,a,k,"x");break;
+  case "fan":rotorBlades(owner,at,.3,a,k,1);break;
+  case "blades":rotorBlades(owner,at,a,b,k);break;
+  case "rings":case "rotor":{
+   const vertical=part.kind==="rotor";
+   for(let i=0;i<8;i++){
+    const d=(vertical?b:a)*(i/7-.5);
+    cyl(owner,add(at,vertical?[0,d,0]:[d,0,0]),vertical?a:b,.14,k,vertical?"y":"x",vertical?a:b,16,false);
+   }
+   if(vertical)cyl(owner,at,.26,b+.7,silver);
+   else for(let i=0;i<8;i++){
+    const t=i*tau/8;
+    box(owner,add(at,[0,Math.sin(t)*b,Math.cos(t)*b]),[a,.10,.10],k);
+   }
+   break;
+  }
+  case "turbShell":{
+   for(const [dx,rr,ww] of [[-4.35,1.51,2.8],[-.95,1.93,3.3],[3.45,2.68,5.1]])cyl(owner,add(at,[dx,0,0]),rr,ww,k,"x",rr,17,false,.59);
+   for(const dx of [-5.7,-2.7,.55,5.7])box(owner,add(at,[dx,-1.22,0]),[.52,.8,3.3],k);
+   break;
+  }
+  case "rollers":for(let i=0;i<3;i++){const t=i*tau/3;cyl(owner,add(at,[Math.cos(t)*a*.64,0,Math.sin(t)*a*.64]),b*.42,b,k,"x",b*.57,12);}break;
+  case "burners":for(let j=0;j<2;j++)for(let i=0;i<3;i++)cyl(owner,[x+(i-1)*a*.32,y+(j-.5)*b*.68,z],.29,c,k,"z",.43,12);break;
+  case "walls":
+   for(let i=0;i<12;i++){
+    const d=(i/11-.5)*a;
+    cyl(owner,[x+d,y,z-c/2],.095,b,k,"y",.095,6);
+    cyl(owner,[x-a/2,y,z+(i/11-.5)*c],.095,b,k,"y",.095,6);
+   }
+   box(owner,[x,y-b/2,z],[a,.2,c],k);break;
+  case "plates":
+   for(let i=0;i<7;i++)box(owner,[x+(i/6-.5)*a,y,z],[.12,b,c],k);
+   break;
+  case "coils":
+   for(let i=0;i<7;i++){
+    const d=(i/6-.5)*c;
+    line(owner,[[x-a/2,y-b/2,z+d],[x-a/2,y+b/2,z+d],[x+a/2,y+b/2,z+d],[x+a/2,y-b/2,z+d],[x-a/2,y-b/2,z+d]],k,1.13);
+    cyl(owner,[x,y-b/2,z+d],.08,a,k,"x",.08,6);
+    cyl(owner,[x,y+b/2,z+d],.08,a,k,"x",.08,6);
+   }break;
+  case "tubes":case "utubes":
+   for(let i=0;i<5;i++)for(let j=0;j<4;j++){
+    const v=y+b*(j/3-.5),w=z+c*(i/4-.5);
+    cyl(owner,[x,v,w],.095,a,k,"x",.095,6);
+    if(part.kind==="utubes"&&j%2===0){
+     const points=Array.from({length:9},(_,idx)=>{const angle=Math.PI*idx/8;return [x+a/2+Math.sin(angle)*b/6,v+(1-Math.cos(angle))*b/6,w];});
+     line(owner,points,k,1.06);
+    }
+   }
+   break;
+  case "tower":tower(owner,at,a,b,k,true);break;
+  case "bushings":
+   for(let i=0;i<3;i++){
+    const dx=(i-1)*a*.37;
+    cyl(owner,[x+dx,y,z],.16,b,k);
+    for(let j=0;j<6;j++)cyl(owner,[x+dx,y+(j/5-.5)*b,z],.4,.11,k,"y",.37,10);
+   }break;
+ }
+}
+function overview(unit){
+ const u=unit.id;
+ const [x,y,z]=unit.pos;
+ const B=(dx,dy,dz,a,b,c,k)=>box(u,[x+dx,y+dy,z+dz],[a,b,c],k);
+ const C=(dx,dy,dz,r,h,k,axis="y",r2=r,cap=true)=>cyl(u,[x+dx,y+dy,z+dz],r,h,k,axis,r2,16,cap);
+ const F=(dx,dy,dz,a,b,c,k)=>frame(u,[x+dx,y+dy,z+dz],[a,b,c],k,.24);
+ const D=(part,at)=>detailed(u,part,add(unit.pos,at));
+ let h=5;
+ switch(unit.form){
+  case "yard":
+   pedestal(u,unit.pos,13,9);
+   for(const d of [-3,3])cyl(u,[x+d,1.35,z],3.4,2.6,"#6d737a","y",.27,10);
+   F(0,2.3,0,12,4.6,7.4,steel);roof(u,[x,4.6,z],12.7,2.1,8.1,"#3f647d");h=7;break;
+  case "bunker":
+   pedestal(u,unit.pos,8,6);F(0,3.1,0,5.2,6,4.3,steel);
+   C(0,4.1,0,2.1,3,dark);C(0,1.95,0,.5,1.8,steel,"y",2.1);B(0,5.7,0,6.7,.55,3.2,steel);h=6;break;
+  case "mill":
+   pedestal(u,unit.pos,7,6);C(0,1.5,0,2.8,2.4,blue);C(0,3.5,0,1.55,1.8,steel,"y",2.25);
+   C(0,4.6,0,.8,.8,silver);B(2.5,1.1,0,2.6,1.8,2.1,dark);h=5.4;break;
+  case "fans":
+   pedestal(u,unit.pos,7.7,5);
+   for(const d of [-1.7,1.7]){C(d,1.8,0,1.41,1.4,blue,"z");D(p("","", "fan",0,0,0,1.06,0,0,"#9acabc"),[d,1.8,.83]);}
+   B(0,3,-.4,5.4,.6,1.2,steel);h=4;break;
+  case "boiler":
+   pedestal(u,unit.pos,13.5,10.7);
+   F(0,7.8,0,11,15.4,8.4,"#a4bacd");B(-1.65,8,0,5.5,11.3,5.8,blue);
+   B(2.9,9.35,-.8,2.8,9,4.6,dark);B(.3,14,-.4,9.4,1.26,6.5,steel);
+   B(-.7,6.4,3,8.8,.24,.69,silver);B(-.7,10.4,3,8.8,.24,.69,silver);
+   for(let i=0;i<12;i++)B(-4+i*.43,8,2.97,.075,10.8,.12,"#83a8bf");
+   for(let i=0;i<3;i++)C(-3.4+i*1.55,5,3.16,.31,1.1,"#d2a36a","z");
+   hopper(u,[x-1.7,1.75,z],5.4,2.6,5.6,"#9a9d96");h=16;break;
+  case "scr":
+   pedestal(u,unit.pos,7.4,6);F(0,3.5,0,6,7,5.5,steel);
+   B(0,4.45,0,5.7,4.1,5,dark);B(0,6.8,0,5,.65,4.7,blue);
+   for(let i=0;i<3;i++)B(0,3.05+i*1.34,2.53,5.85,.24,.31,silver);
+   h=7.4;break;
+  case "aph":
+   pedestal(u,unit.pos,8,8);C(0,2.53,0,3.45,4.72,blue);
+   C(0,4.76,0,3.55,.35,silver);C(0,1.1,0,3.57,.24,steel);
+   B(-1,5.15,.4,3.8,.76,2,dark);h=5.7;break;
+  case "dust":
+   pedestal(u,unit.pos,9,7);F(0,3.68,0,8,7.1,6,steel);
+   B(0,4.5,0,7.9,4.65,5.5,blue);
+   for(const d of [-2.5,0,2.5]){hopper(u,[x+d,1.65,z],2.32,2.3,4.7,silver);B(d,4.5,2.8,.14,4.5,.16,silver);}
+   B(0,6.95,0,8.3,.34,5.9,steel);h=7.65;break;
+  case "fgd":
+   pedestal(u,unit.pos,8,7.4);C(0,4.4,0,3.05,8.6,blue,"y",2.4);
+   C(0,7.5,0,2.7,.19,silver);C(0,3.1,0,3.01,.22,steel);C(0,9,0,1.04,1.35,silver);
+   B(2.8,1.1,1.8,2.2,1.85,2,steel);h=10;break;
+  case "stack":
+   pedestal(u,unit.pos,6.5,6.5);C(0,7.2,0,2.23,14.4,"#998d8d","y",1.31);
+   for(const [height,r] of [[10.1,1.63],[12.35,1.48],[14,1.37]])C(0,height,0,r,.83,"#ce8873");
+   C(0,14.43,0,1.42,.27,silver,"y",1.42,false);h=15;break;
+  case "turbine":
+   pedestal(u,unit.pos,15,6.7);
+   C(0,1.8,0,.31,15,silver,"x");
+   for(const [d,r,w] of [[-4.6,1.32,2.6],[-1.4,1.64,3.25],[3.4,2.15,4.8]]){
+    B(d,.59,0,w,1,r*1.95,dark);C(d,1.96,0,r,w,blue,"x");
+    C(d-w/2,1.96,0,r*1.08,.24,silver,"x");C(d+w/2,1.96,0,r*1.08,.24,steel,"x");
+    B(d,2.23,r*.9,w,.16,.48,silver);
+   }h=4.85;break;
+  case "gen":
+   pedestal(u,unit.pos,10,6.7);B(0,1.36,0,8,2,4.9,dark);C(0,2.3,0,2.02,7.8,blue,"x");
+   for(const d of [-3.6,-2.4,-1.2,0,1.2,2.4,3.6])C(d,2.3,0,2.12,.16,steel,"x");
+   B(1.6,4.48,0,2.2,.78,2,silver);h=5.2;break;
+  case "grid":
+   pedestal(u,unit.pos,9,7.8);B(-.8,1.45,0,4.2,2.8,3.4,blue);
+   for(let i=0;i<7;i++)B(-2.5+i*.56,1.55,1.87,.16,2.48,.7,silver);
+   D(p("","","bushings",0,0,0,4,2.3,2,"#c6c3a7"),[-.8,3.8,0]);
+   F(3,3,0,2.7,6,4.8,silver);h=6.5;break;
+  case "cond":
+   pedestal(u,unit.pos,9.3,6.2);B(0,1.75,0,7.6,2.85,4.9,blue);
+   hopper(u,[x,3.8,z],5.65,1.6,4.25,"#96a6bb");
+   for(const d of [-1,1])C(d*3.93,1.64,0,1.04,.33,steel,"x");h=4.95;break;
+  case "heater":
+   pedestal(u,unit.pos,7.4,5.1);B(0,.58,0,4.0,.86,2.95,dark);C(0,1.95,0,1.45,5.35,blue,"x");
+   for(const d of [-2.58,2.58])C(d,1.95,0,1.54,.17,silver,"x");h=3.75;break;
+  case "dea":
+   pedestal(u,unit.pos,8.2,5.3);F(0,1.9,0,6,3.7,3.5,steel);
+   C(0,2.83,0,1.32,6.65,blue,"x");C(0,4.35,0,1.07,1.35,silver);h=5.5;break;
+  case "pump":
+   pedestal(u,unit.pos,6.4,4.9);B(0,.62,0,5.4,.92,3.22,dark);C(0,1.7,0,1.11,4.8,blue,"x");
+   C(-.6,1.7,0,1.22,.31,silver,"x");C(2.15,1.7,0,.8,.35,silver,"x");h=3.25;break;
+  case "tower":
+   pedestal(u,unit.pos,13.4,13.4);
+   cyl(u,[x,.31,z],6.2,.45,"#3c898c","y",6.2,24);
+   tower(u,[x,6.7,z],5.65,12.8,"#819caf");
+   h=13.7;break;
+  case "ash":
+   pedestal(u,unit.pos,8.3,5.7);
+   for(const d of [-2,2]){
+    F(d,2,0,2.4,4,3,steel);C(d,3.55,0,1.54,2.8,"#9f988b");C(d,1.65,0,.35,1.55,silver,"y",1.51);
+   }h=5.4;break;
+ }
+ marks.push({id:u,at:add(unit.pos,[0,h+.4,0]),name:unit.name});
+}
+function activePath(path){return view.system==="all" || path.systems.split(" ").includes(view.system);}
+function activeUnit(unit){
+ return view.system==="all" || unit.group===view.system || paths.some(path=>activePath(path)&&(path.from===unit.id||path.to===unit.id));
+}
+function rebuild(){
+ mesh=[];marks=[];
+ if(view.mode==="whole"){
+  center=[1,0,0];
+  box(null,[2,-1.04,0],[124,1.9,84],"#223b50");
+  box(null,[2,-.10,0],[123,.12,83],"#254254");
+  box(null,[-33,-.005,6],[43,.025,41],"#2a4557");
+  box(null,[28,-.005,-23],[69,.026,34],"#293e50");
+  box(null,[16,-.005,23],[83,.028,30],"#284755");
+  for(let x=-58;x<=62;x+=4)line(null,[[x,.02,-40],[x,.02,40]],"#466374",1,.42);
+  for(let z=-40;z<=40;z+=4)line(null,[[-59,.02,z],[63,.02,z]],"#466374",1,.42);
+  for(const z of [-40.8,40.8])box(null,[2,.05,z],[122,.09,.15],"#628798");
+  for(const x of [-58.8,62.8])box(null,[x,.05,0],[.15,.09,81.6],"#628798");
+  for(const unit of Object.values(plant))overview(unit);
+ }else{
+  const unit=plant[view.id];
+  center=[0,2.25,0];
+  const span=unit.id==="boiler"||unit.id==="turbine"?16:13;
+  pedestal(null,[0,-1,0],span,span*.78);
+  for(let k=-6;k<=6;k++){
+   line(null,[[k,-.8,-4.8],[k,-.8,4.8]],"#638698",1,.37);
+   line(null,[[-span/2+.4,-.8,k*.77],[span/2-.4,-.8,k*.77]],"#638698",1,.37);
+  }
+  const vectors=[[-.72,.15,-.66],[.82,.12,.73],[-.67,.62,.52],[.72,.8,-.65],[.83,-.06,-.9],[-.63,-.32,.77],[0,.25,-1.08]];
+  unit.parts.forEach((part,i)=>{
+   const at=part.xyz.map((v,j)=>v+vectors[i][j]*view.spread*(j===1?2.5:5.5));
+   detailed(i,part,at);
+   const b=["fan","shellX"].includes(part.kind)?part.size[0]*1.6:part.size[1];
+   marks.push({id:i,at:add(at,[0,b*.55+.2,0]),name:part.name});
+  });
+ }
+ buildLabels();
+ dirty=true;
+}
+function fit(){
+ const rect=canvas.getBoundingClientRect();
+ width=Math.max(1,rect.width);height=Math.max(1,rect.height);
+ const ratio=Math.min(devicePixelRatio||1,1.8);
+ canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);
+ ctx.setTransform(ratio,0,0,ratio,0,0);dirty=true;
+}
+new ResizeObserver(fit).observe(canvas);
+let projector;
+function projection(){
+ const ct=Math.cos(camera.yaw),st=Math.sin(camera.yaw);
+ const cp=Math.cos(camera.pitch),sp=Math.sin(camera.pitch);
+ size=(view.mode==="whole"?Math.min(width/156,height/100):Math.min(width/25,height/21))*camera.zoom;
+ const distance=view.mode==="whole"?310:80;
+ projector=(point)=>{
+  const [x,y,z]=point.map((v,i)=>v-center[i]);
+  const a=ct*x-st*z,b=st*x+ct*z;
+  const dep=b*cp+y*sp,v=b*sp-y*cp;
+  const scale=size*distance/(distance-dep);
+  return [width*.5+a*scale,height*(view.mode==="whole"?.47:.54)+v*scale,dep,scale];
+ };
+}
+function poly(points,close=true){
+ const path=new Path2D();
+ path.moveTo(points[0][0],points[0][1]);
+ for(let i=1;i<points.length;i++)path.lineTo(points[i][0],points[i][1]);
+ if(close)path.closePath();
+ return path;
+}
+function prepareStream(path){
+ let length=0;
+ const segments=[];
+ for(let k=0;k<path.points.length-1;k++){
+  const a=path.points[k],b=path.points[k+1];
+  const span=Math.hypot(...b.map((v,i)=>v-a[i]));
+  if(span){segments.push({a,b,span,start:length});length+=span;}
+ }
+ return {path,length,segments};
+}
+const streams=paths.map(prepareStream);
+let drawList=[], shownStreams=[];
+const backdrop=document.createElement("canvas"), backdropContext=backdrop.getContext("2d");
+function updateProjection(){
+ projection();
+ drawList=mesh.map(item=>{
+  const points=item.points.map(projector);
+  const depth=points.reduce((sum,v)=>sum+v[2],0)/points.length;
+  return {...item,points,depth};
+ });
+ shownStreams=[];
+ if(view.mode==="whole"){
+  for(const entry of streams){
+   const {path,segments}=entry;
+   if(!activePath(path)||!visible[path.kind])continue;
+   shownStreams.push(entry);
+   for(const {a,b} of segments){
+    const count=Math.max(1,Math.ceil(Math.hypot(...b.map((v,i)=>v-a[i]))/5));
+    for(let i=0;i<count;i++){
+     const points=[projector(mix(a,b,i/count)),projector(mix(a,b,(i+1)/count))];
+     drawList.push({flow:path.kind,points,depth:(points[0][2]+points[1][2])/2+.09});
+    }
+   }
+  }
+  }
+ drawList.sort((a,b)=>Number(a.owner!==null)-Number(b.owner!==null)||a.depth-b.depth);
+ hit=[];
+ for(const item of drawList){
+  item.path=poly(item.points,!item.line&&!item.flow);
+  if(item.owner!==null&&item.owner!==undefined&&!item.line)hit.push(item);
+ }
+ layoutLabels();
+ drawBackdrop();
+}
+function drawBackdrop(){
+ backdrop.width=canvas.width;backdrop.height=canvas.height;
+ backdropContext.setTransform(canvas.width/width,0,0,canvas.height/height,0,0);
+ paint(backdropContext);
+}
+function paint(ctx){
+ ctx.lineJoin="round";ctx.lineCap="round";
+ for(const item of drawList){
+  if(item.flow){
+   const color=flows[item.flow][1];
+   ctx.globalAlpha=.93;ctx.strokeStyle="#151f2a";ctx.lineWidth=Math.max(2.4,size*.97);ctx.stroke(item.path);
+   ctx.globalAlpha=.63;ctx.strokeStyle=color;ctx.lineWidth=Math.max(1.5,size*.46);
+   if(item.flow==="power"||item.flow==="heat")ctx.setLineDash([5,4]);
+   ctx.stroke(item.path);ctx.setLineDash([]);
+   continue;
+  }
+  const selected=view.mode==="whole"?view.picked&&item.owner===view.id:item.owner===view.part;
+  const muted=view.mode==="whole"&&item.owner&&!activeUnit(plant[item.owner]);
+  ctx.globalAlpha=item.alpha*(muted?.36:1);
+  if(item.line){ctx.strokeStyle=item.color;ctx.lineWidth=1.1;ctx.stroke(item.path);continue;}
+  ctx.fillStyle=item.color;ctx.fill(item.path);
+  ctx.strokeStyle=selected?(view.mode==="detail"?"#99e8e0bb":"#7de2ddba"):"#111b273b";
+  ctx.lineWidth=selected?.92:.7;ctx.stroke(item.path);
+ }
+ ctx.globalAlpha=1;
+}
+function draw(){
+ if(dirty)updateProjection();
+ ctx.clearRect(0,0,width,height);
+ ctx.drawImage(backdrop,0,0,width,height);
+ for(const {path,segments,length} of shownStreams){
+  const speed={coal:5,air:10,gas:8,steam:12,reheat:8,water:6,cool:7,ash:4,power:17,heat:8}[path.kind];
+  const count=Math.min(14,Math.max(2,Math.ceil(length/5)));
+  const color=flows[path.kind][1];
+  for(let i=0;i<count;i++){
+   const d=(clock*speed+i*length/count)%length;
+   const segment=segments.find(s=>d<s.start+s.span)??segments.at(-1);
+   const pos=projector(mix(segment.a,segment.b,(d-segment.start)/segment.span));
+   const start=projector(mix(segment.a,segment.b,Math.max(0,(d-segment.start-.6)/segment.span)));
+   ctx.globalAlpha=.23;ctx.fillStyle=color;ctx.beginPath();ctx.arc(pos[0],pos[1],Math.max(2.1,pos[3]*.63),0,tau);ctx.fill();
+   ctx.globalAlpha=.97;ctx.strokeStyle=color;ctx.lineWidth=Math.max(1.3,pos[3]*.34);ctx.beginPath();ctx.moveTo(start[0],start[1]);ctx.lineTo(pos[0],pos[1]);ctx.stroke();
+   ctx.fillStyle="#fff3d4";ctx.beginPath();ctx.arc(pos[0],pos[1],Math.max(.68,pos[3]*.13),0,tau);ctx.fill();
+  }
+ }
+ ctx.globalAlpha=1;
+ dirty=false;
+}
+function animate(now){
+ const delta=last?Math.min(.06,(now-last)/1000):0;
+ if(dirty||(view.playing&&view.mode==="whole"&&delta>=.027)){
+  if(view.playing)clock+=delta*view.speed;
+  draw();last=now;
+ }
+ requestAnimationFrame(animate);
+}
+function buildLabels(){
+ const layer=$("labels");layer.replaceChildren();
+ for(const mark of marks){
+  const button=document.createElement("button");
+  button.className="label"+(view.mode==="detail"?" part":"");
+  button.textContent=mark.name;button.type="button";
+  button.addEventListener("click",()=>activateMark(mark.id));
+  layer.append(button);mark.button=button;
+ }
+}
+const major=["boiler","tower","turbine","gen","stack","yard","cond","fgd","grid","dust","scr","aph","mill"];
+function layoutLabels(){
+ const prioritized=[...marks].sort((a,b)=>markRank(a)-markRank(b));
+ const rects=[];
+ for(const mark of prioritized){
+  const [x,y]=projector(mark.at);
+  const sel=view.mode==="detail"?mark.id===view.part:view.picked&&mark.id===view.id;
+  const active=view.mode==="detail"||activeUnit(plant[mark.id]);
+  mark.button.classList.toggle("selected",sel);
+  if(!view.labels||!active||x<22||x>width-19||y<36||y>height-26){mark.button.hidden=true;continue;}
+  mark.button.hidden=false;mark.button.style.left=x+"px";mark.button.style.top=y+"px";
+  const ww=mark.button.offsetWidth+6,hh=mark.button.offsetHeight+3;
+  let labelY=y;
+  let r;
+  for(const shift of [0,-hh-1,hh+1]){
+   labelY=y+shift;
+   const trial=[x-ww/2,labelY-hh,x+ww/2,labelY];
+   if(sel||(!rects.some(v=>trial[0]<v[2]&&trial[2]>v[0]&&trial[1]<v[3]&&trial[3]>v[1])&&trial[0]>1&&trial[2]<width-1)){
+    r=trial;break;
+   }
+  }
+  if(!r){mark.button.hidden=true;continue;}
+  mark.button.style.top=labelY+"px";rects.push(r);
+ }
+}
+function markRank(mark){
+ if(view.mode==="detail")return mark.id===view.part?-1:mark.id;
+ if(view.picked&&mark.id===view.id)return -1;
+ const index=major.indexOf(mark.id);
+ return index<0?99:index;
+}
+function activateMark(id){
+ if(view.mode==="detail"){view.part=id;renderPanel();dirty=true;}
+ else if(view.picked&&view.id===id)openDetail(id);
+ else selectUnit(id);
+}
+function selectUnit(id){
+ if(view.mode==="detail"){openDetail(id);return;}
+ view.id=id;view.picked=true;renderUI();dirty=true;
+}
+function openDetail(id){
+ view.id=id;view.mode="detail";view.picked=true;view.part=0;
+ resetCamera();
+ rebuild();renderUI();
+}
+function resetCamera(){
+ camera.yaw=view.mode==="whole"?.53:.50;
+ camera.pitch=view.mode==="whole"?.60:.43;
+ camera.zoom=1;dirty=true;
+}
+function openWhole(){
+ view.mode="whole";resetCamera();rebuild();renderUI();
+}
+function resetSystem(id){
+ view.system=id;view.picked=false;
+ view.id=systems.find(s=>s[0]===id)[4][0];
+ if(id==="all")view.id="boiler";
+ openWhole();
+}
+function buildMenus(){
+ $("systems").innerHTML=systems.map(([id,icon,name])=>'<button class="sys" data-sys="'+id+'"><b>'+icon+'</b>'+name+'</button>').join("");
+ $("legend").innerHTML=Object.entries(flows).map(([id,[name,color,tag]])=>'<button class="flow" style="--color:'+color+'" data-flow="'+id+'" aria-pressed="true"><span></span>'+name+'<em>'+tag+'</em></button>').join("");
+ $("systems").addEventListener("click",e=>{const b=e.target.closest("button");if(b)resetSystem(b.dataset.sys);});
+ $("legend").addEventListener("click",e=>{
+  const b=e.target.closest("button");
+  if(!b)return;
+  const key=b.dataset.flow;
+  visible[key]=!visible[key];
+  b.setAttribute("aria-pressed",visible[key]);dirty=true;
+ });
+}
+function renderUI(){
+ const system=systems.find(s=>s[0]===view.system),unit=plant[view.id],detail=view.mode==="detail";
+ $("viewTitle").textContent=detail?unit.name:system[2];
+ $("viewSub").textContent=detail?"拖动观察内部结构，点击部件查看原理。":view.system==="all"?"点击设备查看结构，沿彩色管线追踪物质与能量。":system[3];
+ $("viewTag").textContent=detail?"设备 · 拆解视图":"全厂 · 3D 场景";
+ $("whole").classList.toggle("active",!detail);$("whole").setAttribute("aria-pressed",!detail);
+ $("detail").classList.toggle("active",detail);$("detail").setAttribute("aria-pressed",detail);
+ for(const button of $("systems").querySelectorAll("button")){
+  const selected=button.dataset.sys===view.system;
+  button.classList.toggle("active",selected);button.setAttribute("aria-pressed",selected);
+ }
+ const chain=system[4].map(id=>'<button data-unit="'+id+'">'+plant[id].name+'</button>');
+ $("chain").innerHTML=(["fuel","ash"].includes(view.system)?chain.join(" "):chain.join("<i aria-hidden='true'>›</i>"));
+ renderPanel();
+}
+function renderPanel(){
+ const unit=plant[view.id],detail=view.mode==="detail",group=systems.find(s=>s[0]===unit.group);
+ const equipment=Object.values(plant).filter(activeUnit);
+ const list=equipment.map(u=>'<button data-unit="'+u.id+'" class="'+(view.picked&&u.id===view.id?"active":"")+'">'+u.name+'</button>').join("");
+ if(!view.picked){
+  $("info").innerHTML='<h2>设备索引</h2><p>从总览选择设备，查看进出口、工作原理和内部部件。</p><div class="equiplist">'+list+'</div>';
+  return;
+ }
+ const rows=[["入口",unit.ports[0]],["出口",unit.ports[1]],...unit.stats].map(([k,v])=>"<div><dt>"+k+"</dt><dd>"+v+"</dd></div>").join("");
+ const parts=unit.parts.map((part,i)=>'<button data-part="'+i+'" class="'+(detail&&view.part===i?"active":"")+'">'+part.name+'</button>').join("");
+ $("info").innerHTML='<span class="badge">'+group[2]+'</span><h2>'+unit.name+'</h2><p>'+unit.note+'</p><dl>'+rows+'</dl>'+
+  (detail?'<button class="inspectButton" data-action="whole">返回全厂视图</button><label class="range">拆解幅度<input id="spread" aria-label="拆解幅度" type="range" min="0" max="100" value="'+Math.round(view.spread*100)+'"></label>':'<button class="inspectButton" data-action="detail">进入 3D 拆解</button>')+
+  '<h3>内部部件</h3><div class="parts">'+parts+'</div>'+
+  (detail?'<p class="partnote"><strong>'+unit.parts[view.part].name+'</strong><br>'+unit.parts[view.part].note+'</p>':'<h3>设备索引</h3><div class="equiplist">'+list+'</div>');
+ const slider=$("spread");
+ if(slider)slider.addEventListener("input",()=>{view.spread=Number(slider.value)/100;rebuild();});
+}
+$("info").addEventListener("click",event=>{
+ const button=event.target.closest("button");
+ if(!button)return;
+ if(button.dataset.unit){selectUnit(button.dataset.unit);return;}
+ if(button.dataset.action==="detail"){openDetail(view.id);return;}
+ if(button.dataset.action==="whole"){openWhole();return;}
+ if(button.dataset.part!==undefined){
+  const target=Number(button.dataset.part);
+  if(view.mode==="whole")openDetail(view.id);
+  view.part=target;renderPanel();dirty=true;
+  $("info").querySelector('[data-part="'+target+'"]').focus({preventScroll:true});
+ }
+});
+$("chain").addEventListener("click",event=>{const b=event.target.closest("[data-unit]");if(b)selectUnit(b.dataset.unit);});
+$("whole").onclick=openWhole;$("detail").onclick=()=>openDetail(view.id);
+function zoomBy(value){camera.zoom=Math.max(.54,Math.min(3.5,camera.zoom*value));dirty=true;}
+$("plus").onclick=()=>zoomBy(1.19);$("minus").onclick=()=>zoomBy(1/1.19);$("reset").onclick=resetCamera;
+$("labelToggle").onclick=()=>{view.labels=!view.labels;$("labelToggle").setAttribute("aria-pressed",view.labels);dirty=true;};
+function updatePlay(){
+ $("play").textContent=view.playing?"Ⅱ":"▶";
+ $("play").setAttribute("aria-label",view.playing?"暂停流动动画":"播放流动动画");
+ $("playState").textContent=view.playing?"播放中":"已暂停";
+}
+$("play").onclick=()=>{view.playing=!view.playing;last=0;dirty=true;updatePlay();};
+$("speed").onchange=()=>{view.speed=Number($("speed").value);};
+const inputs=new Map();
+let drag=0;
+const clampPitch=()=>{camera.pitch=Math.max(-.13,Math.min(1.40,camera.pitch));};
+canvas.addEventListener("pointerdown",e=>{
+ if(e.button!==0&&e.pointerType==="mouse")return;
+ if(inputs.size===0)drag=0;
+ inputs.set(e.pointerId,[e.clientX,e.clientY]);
+ canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener("pointermove",e=>{
+ const start=inputs.get(e.pointerId);
+ if(!start)return;
+ const end=[e.clientX,e.clientY];
+ if(inputs.size>1){
+  const peer=[...inputs.entries()].find(([id])=>id!==e.pointerId)[1];
+  const distance=v=>Math.max(5,Math.hypot(v[0]-peer[0],v[1]-peer[1]));
+  zoomBy(distance(end)/distance(start));drag=20;
+ }else{
+  const [dx,dy]=end.map((v,i)=>v-start[i]);
+  camera.yaw+=dx*.009;camera.pitch+=dy*.007;clampPitch();dirty=true;drag+=Math.hypot(dx,dy);
+ }
+ inputs.set(e.pointerId,end);
+});
+canvas.addEventListener("pointerup",e=>{
+ if(!inputs.delete(e.pointerId)||drag>5)return;
+ const rect=canvas.getBoundingClientRect();
+ const x=(e.clientX-rect.left)*canvas.width/width,y=(e.clientY-rect.top)*canvas.height/height;
+ for(let i=hit.length-1;i>=0;i--){
+  if(ctx.isPointInPath(hit[i].path,x,y)){
+   activateMark(hit[i].owner);break;
+  }
+ }
+});
+for(const event of ["pointercancel","lostpointercapture"])canvas.addEventListener(event,e=>inputs.delete(e.pointerId));
+canvas.addEventListener("wheel",e=>{e.preventDefault();zoomBy(Math.exp(-Math.max(-150,Math.min(150,e.deltaY))*.0027));},{passive:false});
+canvas.addEventListener("keydown",e=>{
+ switch(e.key){
+  case "ArrowLeft":camera.yaw-=.12;break;
+  case "ArrowRight":camera.yaw+=.12;break;
+  case "ArrowUp":camera.pitch+=.09;break;
+  case "ArrowDown":camera.pitch-=.09;break;
+  case "+":case "=":zoomBy(1.16);break;
+  case "-":zoomBy(1/1.16);break;
+  case "Home":resetCamera();break;
+  default:return;
+ }
+ e.preventDefault();clampPitch();dirty=true;
+});
+fit();buildMenus();rebuild();renderUI();updatePlay();requestAnimationFrame(animate);
+
+</script>
+</body></html>
