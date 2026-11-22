@@ -13,25 +13,6 @@
 .viewport:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 18% 17%,rgba(255,255,255,.82) 0 7%,rgba(255,255,255,0) 18%),radial-gradient(ellipse at 71% 12%,rgba(255,255,255,.66) 0 5%,rgba(255,255,255,0) 17%),linear-gradient(180deg,rgba(174,218,237,.58) 0%,rgba(220,235,230,.22) 44%,rgba(145,168,160,.16) 100%)}.viewport canvas,.viewport #labels,.viewport .viewtag,.viewport .camera,.viewport .hint{position:relative;z-index:1}.viewport canvas{background:transparent}.timeline button[aria-pressed="true"]{background:#164e55;border-color:#5da9a6;color:#b7fff6}
 
 </style>
-</head>
-<body>
-<header class="top"><div class="wordmark"><span class="logo">ϟ</span><span><strong>火力发电厂</strong><small>3D 智慧模型</small></span></div><div class="type"><i></i>超临界燃煤机组</div><div class="rating"><strong>660 <small>MW</small></strong><span>单机额定功率</span></div></header>
-<main>
-<aside class="systems"><div class="asidehead"><span>系统导航</span><small>SYSTEMS</small></div><nav id="systems" aria-label="系统导航"></nav><div class="legend"><div class="asidehead"><span>流股图例</span><small>FLOW KEY</small></div><div id="legend"></div></div></aside>
-<section class="work" aria-label="3D 模型">
-<div class="workhead"><div><span class="kicker">机组全流程 · 岱海厂区精模版</span><h1 id="viewTitle">全厂总览</h1><p id="viewSub">点击设备查看结构，沿彩色管线追踪物质与能量。</p></div><div class="switch" aria-label="视图模式"><button id="whole" class="active">全厂视图</button><button id="detail">设备视图</button></div></div>
-<div class="viewport" id="viewport"><canvas id="scene" tabindex="0" aria-label="互动 3D 场景，使用方向键旋转，加减键缩放"></canvas><div id="labels"></div>
-<div class="viewtag"><i></i><span id="viewTag">全厂 · 3D 场景</span></div>
-<div class="camera"><button id="plus" title="放大" aria-label="放大">+</button><button id="minus" title="缩小" aria-label="缩小">−</button><button id="reset" title="重置视角" aria-label="重置视角">⟲</button></div>
-<div class="hint">拖动旋转 <b>·</b> 滚轮 / 双指缩放 <b>·</b> 点击选择</div></div>
-<div class="timeline"><button id="play" class="play" aria-label="暂停流动动画">Ⅱ</button><div class="timecaption"><strong>流动动画</strong><small id="playState">播放中</small></div><div class="speedwrap"><label for="speed">速度</label><select id="speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div><button id="labelToggle" aria-pressed="true">设备标签</button><button id="immersion" aria-pressed="false">第一视角</button></div>
-<nav class="site-nav" aria-label="厂区模式"><span>厂区模式</span><button data-site="daihai" aria-pressed="true">京能岱海 · 公开资料复原</button><button data-site="generic" aria-pressed="false">通用 660 MW 单元</button></nav>
-<nav class="reference-nav" aria-label="实物结构精模"><span>工程图对照</span><button data-reference="boiler">直流锅炉</button><button data-reference="turbine">汽轮机组</button><button data-reference="cond">凝汽器</button></nav>
-<section class="sequence"><div class="asidehead"><span>流程导览</span><small>PROCESS</small></div><div id="chain"></div></section>
-</section>
-<aside class="inspector"><div class="asidehead"><span>学习面板</span><small>INSPECTOR</small></div><div id="info" aria-live="polite"></div></aside>
-</main>
-<footer><span>660 MW 超临界燃煤机组教学模型 · 岱海厂区为公开资料复原 · 精模来源见设备面板</span><a href="https://openjicareport.jica.go.jp/pdf/12149506_02.pdf" target="_blank" rel="noopener">660 MW 参考配置</a><a href="https://netl.doe.gov/projects/files/CostandPerformanceBaselineFossilEnergyPlantsVolume1BituminousCoalNaturalGastoElectricity_052125.pdf" target="_blank" rel="noopener">NETL 流程参考</a></footer>
 <script>
 "use strict";
 const flows = {
@@ -603,7 +584,7 @@ const $ = id => document.getElementById(id);
 const canvas = $("scene"), ctx = canvas.getContext("2d");
 const visible = Object.fromEntries(Object.keys(flows).map(key=>[key,true]));
 const view = {system:"all",id:"boiler",mode:"whole",picked:false,siteMode:"daihai",part:0,arrangement:"section",isolate:false,internalFlow:false,immersion:false,spread:.7,labels:true,playing:!matchMedia("(prefers-reduced-motion: reduce)").matches,speed:1};
-const camera = {yaw:.53,pitch:.38,zoom:1.06};
+const camera = {yaw:.53,pitch:.28,zoom:1.30};
 let mesh=[], hit=[], marks=[], width=1,height=1, size=1, clock=0, last=0, dirty=true, siteRoutes=[];
 let items=[], center=[0,0,0];
 const tau=2*Math.PI;
@@ -872,9 +853,9 @@ function activeUnit(unit){
 }
 function daihaiSite(){
  siteRoutes=[];
- center=[1,0,1];
- box(null,[2,-1.04,1],[142,1.9,96],"#87999a");
- box(null,[2,-.10,1],[141,.12,95],"#aebdbc");
+ center=[2,0,1];
+ box(null,[2,-1.04,1],[136,1.9,88],"#87999a");
+ box(null,[2,-.10,1],[135,.12,87],"#aebdbc");
  // 岱海位于厂区北侧，公开资料仅用于方向关系示意，不代表测绘边界。
  box(null,[2,.00,-47],[138,.08,8],"#70aeb8");
  for(let x=-66;x<=70;x+=4)line(null,[[x,.02,-42],[x,.02,44]],"#71898d",1,.28);
@@ -907,10 +888,10 @@ function daihaiSite(){
   for(const z of [-4,24]){box(null,[rackx,.9,z],[.22,2, .22],"#7894a5");box(null,[rackx+1.5,.9,z],[.22,2,.22],"#7894a5");}
  });
  // 在 3#、4# 机组岛中放入按同一套设备几何缩放的真实设备组，避免厂区只剩下标签和方块。
- drawDaihaiUnitEquipment(-47,4,.18,.45);
- drawDaihaiUnitEquipment(-16,4,.18,.45);
- drawDaihaiUnitEquipment(17,4,.18,.45);
- drawDaihaiUnitEquipment(50,4,.18,.45);
+ drawDaihaiUnitEquipment(-47,4,.23,.56);
+ drawDaihaiUnitEquipment(-16,4,.23,.56);
+ drawDaihaiUnitEquipment(17,4,.23,.56);
+ drawDaihaiUnitEquipment(50,4,.23,.56);
  drawDaihaiProcessPipes();
  // 燃煤与烟气公用系统区
  box(null,[-54,.12,37],[18,.18,8],"#4d5a63");
@@ -1012,7 +993,7 @@ function projection(){
  const cp=Math.cos(camera.pitch),sp=Math.sin(camera.pitch);
  const base=referenceEquipment[view.id]?.fit??[25,21];
  const factor=view.arrangement==="exploded"&&referenceEquipment[view.id]?1+view.spread*.25:1;
- size=(view.mode==="whole"?Math.min(width/156,height/100):Math.min(width/base[0],height/base[1])/factor)*camera.zoom;
+ size=(view.mode==="whole"?Math.min(width/145,height/92):Math.min(width/base[0],height/base[1])/factor)*camera.zoom;
  const distance=view.mode==="whole"?310:80;
  projector=(point)=>{
   const [x,y,z]=point.map((v,i)=>v-center[i]);
@@ -1192,8 +1173,8 @@ function openDetail(id){
 }
 function resetCamera(){
  camera.yaw=view.mode==="whole"?.53:view.id==="turbine"?.28:.50;
- camera.pitch=view.mode==="whole"?.38:view.id==="boiler"?.19:.32;
- camera.zoom=view.mode==="whole"?1.06:1;
+ camera.pitch=view.mode==="whole"?.28:view.id==="boiler"?.19:.32;
+ camera.zoom=view.mode==="whole"?1.30:1;
  view.immersion=false;
  const immersion=$("immersion"); if(immersion)immersion.setAttribute("aria-pressed","false");
  dirty=true;
@@ -1313,8 +1294,8 @@ $("plus").onclick=()=>zoomBy(1.19);$("minus").onclick=()=>zoomBy(1/1.19);$("rese
 $("labelToggle").onclick=()=>{view.labels=!view.labels;$("labelToggle").setAttribute("aria-pressed",view.labels);dirty=true;};
 $("immersion").onclick=()=>{
  view.immersion=!view.immersion;
- if(view.immersion){view.mode="whole";view.siteMode="daihai";camera.yaw=.18;camera.pitch=.12;camera.zoom=1.34;}
- else {camera.yaw=.53;camera.pitch=.38;camera.zoom=1.06;}
+ if(view.immersion){view.mode="whole";view.siteMode="daihai";camera.yaw=.18;camera.pitch=.10;camera.zoom=1.48;}
+ else {camera.yaw=.53;camera.pitch=.28;camera.zoom=1.30;}
  $("immersion").setAttribute("aria-pressed",view.immersion);rebuild();renderUI();
 };
 function updatePlay(){
@@ -1375,4 +1356,23 @@ canvas.addEventListener("keydown",e=>{
 fit();buildMenus();rebuild();renderUI();updatePlay();requestAnimationFrame(animate);
 
 </script>
+</head>
+<body>
+<header class="top"><div class="wordmark"><span class="logo">ϟ</span><span><strong>火力发电厂</strong><small>3D 智慧模型</small></span></div><div class="type"><i></i>超临界燃煤机组</div><div class="rating"><strong>660 <small>MW</small></strong><span>单机额定功率</span></div></header>
+<main>
+<aside class="systems"><div class="asidehead"><span>系统导航</span><small>SYSTEMS</small></div><nav id="systems" aria-label="系统导航"></nav><div class="legend"><div class="asidehead"><span>流股图例</span><small>FLOW KEY</small></div><div id="legend"></div></div></aside>
+<section class="work" aria-label="3D 模型">
+<div class="workhead"><div><span class="kicker">机组全流程 · 交互教学</span><h1 id="viewTitle">全厂总览</h1><p id="viewSub">点击设备查看结构，沿彩色管线追踪物质与能量。</p></div><div class="switch" aria-label="视图模式"><button id="whole" class="active">全厂视图</button><button id="detail">设备视图</button></div></div>
+<div class="viewport" id="viewport"><canvas id="scene" tabindex="0" aria-label="互动 3D 场景，使用方向键旋转，加减键缩放"></canvas><div id="labels"></div>
+<div class="viewtag"><i></i><span id="viewTag">全厂 · 3D 场景</span></div>
+<div class="camera"><button id="plus" title="放大" aria-label="放大">+</button><button id="minus" title="缩小" aria-label="缩小">−</button><button id="reset" title="重置视角" aria-label="重置视角">⟲</button></div>
+<div class="hint">拖动旋转 <b>·</b> 滚轮 / 双指缩放 <b>·</b> 点击选择</div></div>
+<div class="timeline"><button id="play" class="play" aria-label="暂停流动动画">Ⅱ</button><div class="timecaption"><strong>流动动画</strong><small id="playState">播放中</small></div><div class="speedwrap"><label for="speed">速度</label><select id="speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div><button id="labelToggle" aria-pressed="true">设备标签</button><button id="immersion" aria-pressed="false">第一视角</button></div>
+<nav class="site-nav" aria-label="厂区模式"><span>厂区模式</span><button data-site="daihai" aria-pressed="true">京能岱海 · 公开资料复原</button><button data-site="generic" aria-pressed="false">通用 660 MW 单元</button></nav>
+<nav class="reference-nav" aria-label="实物结构精模"><span>工程图对照</span><button data-reference="boiler">直流锅炉</button><button data-reference="turbine">汽轮机组</button><button data-reference="cond">凝汽器</button></nav>
+<section class="sequence"><div class="asidehead"><span>流程导览</span><small>PROCESS</small></div><div id="chain"></div></section>
+</section>
+<aside class="inspector"><div class="asidehead"><span>学习面板</span><small>INSPECTOR</small></div><div id="info" aria-live="polite"></div></aside>
+</main>
+<footer><span>660 MW 超临界燃煤机组教学模型 · 岱海厂区为公开资料复原 · 精模来源见设备面板</span><a href="https://openjicareport.jica.go.jp/pdf/12149506_02.pdf" target="_blank" rel="noopener">660 MW 参考配置</a><a href="https://netl.doe.gov/projects/files/CostandPerformanceBaselineFossilEnergyPlantsVolume1BituminousCoalNaturalGastoElectricity_052125.pdf" target="_blank" rel="noopener">NETL 流程参考</a></footer>
 </body></html>
