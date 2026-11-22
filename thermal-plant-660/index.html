@@ -10,6 +10,8 @@
 .site-nav{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:11px;padding:8px 10px;border:1px solid #3a5367;border-radius:8px;background:#111f2d}.site-nav span{color:#c1d1e1;font-size:13px;font-weight:650;margin-right:4px}.site-nav button{padding:6px 8px;font-size:13px}.site-nav button[aria-pressed="true"]{background:#133d46;border-color:#4c9997;color:#a5f2ec}
 .viewport{background:linear-gradient(165deg,#d7e4e5 0%,#bccfd1 50%,#9fb6b9 100%)}
 
+.viewport:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 18% 17%,rgba(255,255,255,.82) 0 7%,rgba(255,255,255,0) 18%),radial-gradient(ellipse at 71% 12%,rgba(255,255,255,.66) 0 5%,rgba(255,255,255,0) 17%),linear-gradient(180deg,rgba(174,218,237,.58) 0%,rgba(220,235,230,.22) 44%,rgba(145,168,160,.16) 100%)}.viewport canvas,.viewport #labels,.viewport .viewtag,.viewport .camera,.viewport .hint{position:relative;z-index:1}.viewport canvas{background:transparent}.timeline button[aria-pressed="true"]{background:#164e55;border-color:#5da9a6;color:#b7fff6}
+
 </style>
 </head>
 <body>
@@ -22,7 +24,7 @@
 <div class="viewtag"><i></i><span id="viewTag">全厂 · 3D 场景</span></div>
 <div class="camera"><button id="plus" title="放大" aria-label="放大">+</button><button id="minus" title="缩小" aria-label="缩小">−</button><button id="reset" title="重置视角" aria-label="重置视角">⟲</button></div>
 <div class="hint">拖动旋转 <b>·</b> 滚轮 / 双指缩放 <b>·</b> 点击选择</div></div>
-<div class="timeline"><button id="play" class="play" aria-label="暂停流动动画">Ⅱ</button><div class="timecaption"><strong>流动动画</strong><small id="playState">播放中</small></div><div class="speedwrap"><label for="speed">速度</label><select id="speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div><button id="labelToggle" aria-pressed="true">设备标签</button></div>
+<div class="timeline"><button id="play" class="play" aria-label="暂停流动动画">Ⅱ</button><div class="timecaption"><strong>流动动画</strong><small id="playState">播放中</small></div><div class="speedwrap"><label for="speed">速度</label><select id="speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div><button id="labelToggle" aria-pressed="true">设备标签</button><button id="immersion" aria-pressed="false">第一视角</button></div>
 <nav class="site-nav" aria-label="厂区模式"><span>厂区模式</span><button data-site="daihai" aria-pressed="true">京能岱海 · 公开资料复原</button><button data-site="generic" aria-pressed="false">通用 660 MW 单元</button></nav>
 <nav class="reference-nav" aria-label="实物结构精模"><span>工程图对照</span><button data-reference="boiler">直流锅炉</button><button data-reference="turbine">汽轮机组</button><button data-reference="cond">凝汽器</button></nav>
 <section class="sequence"><div class="asidehead"><span>流程导览</span><small>PROCESS</small></div><div id="chain"></div></section>
@@ -600,8 +602,8 @@ function buildReference(unit){
 const $ = id => document.getElementById(id);
 const canvas = $("scene"), ctx = canvas.getContext("2d");
 const visible = Object.fromEntries(Object.keys(flows).map(key=>[key,true]));
-const view = {system:"all",id:"boiler",mode:"whole",picked:false,siteMode:"daihai",part:0,arrangement:"section",isolate:false,internalFlow:false,spread:.7,labels:true,playing:!matchMedia("(prefers-reduced-motion: reduce)").matches,speed:1};
-const camera = {yaw:.53,pitch:.60,zoom:1};
+const view = {system:"all",id:"boiler",mode:"whole",picked:false,siteMode:"daihai",part:0,arrangement:"section",isolate:false,internalFlow:false,immersion:false,spread:.7,labels:true,playing:!matchMedia("(prefers-reduced-motion: reduce)").matches,speed:1};
+const camera = {yaw:.53,pitch:.38,zoom:1.06};
 let mesh=[], hit=[], marks=[], width=1,height=1, size=1, clock=0, last=0, dirty=true, siteRoutes=[];
 let items=[], center=[0,0,0];
 const tau=2*Math.PI;
@@ -877,7 +879,12 @@ function daihaiSite(){
  box(null,[2,.00,-47],[138,.08,8],"#70aeb8");
  for(let x=-66;x<=70;x+=4)line(null,[[x,.02,-42],[x,.02,44]],"#71898d",1,.28);
  for(let z=-42;z<=44;z+=4)line(null,[[-68,.02,z],[72,.02,z]],"#71898d",1,.28);
- // 四台机组岛，1、2 号按公开资料保留历史水冷改造标识，3、4 号按 660 MW 增容单元表达。
+ // 厂界绿化带与道路两侧乔木，给第一视角提供尺度参照。
+ for(const [tx,tz] of [[-63,-30],[-57,-30],[-51,-30],[-30,-30],[-3,-30],[28,-30],[58,-30],[63,32],[57,32],[51,32],[-63,10],[-63,-3],[63,13],[63,-5]]){
+  cyl(null,[tx,.55,tz],.12,1.1,"#6f513b","y",.12,8);
+  cyl(null,[tx,1.45,tz],.72,1.65,"#5d8d5c","y",.18,10);
+ }
+ // 四台机组岛，1、2 号按公开资料保留历史水冷改造标识，3、4 号按 660 MW 增容单元表达.
  const units=[[-47,"1# 600 MW"],[-16,"2# 600 MW"],[17,"3# 660 MW"],[50,"4# 660 MW"]];
  units.forEach(([x,label],index)=>{
   box(null,[x,.12,4],[24,.18,30],index<2?"#2d5061":"#31566a");
@@ -900,6 +907,8 @@ function daihaiSite(){
   for(const z of [-4,24]){box(null,[rackx,.9,z],[.22,2, .22],"#7894a5");box(null,[rackx+1.5,.9,z],[.22,2,.22],"#7894a5");}
  });
  // 在 3#、4# 机组岛中放入按同一套设备几何缩放的真实设备组，避免厂区只剩下标签和方块。
+ drawDaihaiUnitEquipment(-47,4,.18,.45);
+ drawDaihaiUnitEquipment(-16,4,.18,.45);
  drawDaihaiUnitEquipment(17,4,.18,.45);
  drawDaihaiUnitEquipment(50,4,.18,.45);
  drawDaihaiProcessPipes();
@@ -1183,8 +1192,11 @@ function openDetail(id){
 }
 function resetCamera(){
  camera.yaw=view.mode==="whole"?.53:view.id==="turbine"?.28:.50;
- camera.pitch=view.mode==="whole"?.60:view.id==="boiler"?.19:.32;
- camera.zoom=1;dirty=true;
+ camera.pitch=view.mode==="whole"?.38:view.id==="boiler"?.19:.32;
+ camera.zoom=view.mode==="whole"?1.06:1;
+ view.immersion=false;
+ const immersion=$("immersion"); if(immersion)immersion.setAttribute("aria-pressed","false");
+ dirty=true;
 }
 function openWhole(){
  view.mode="whole";resetCamera();rebuild();renderUI();
@@ -1299,6 +1311,12 @@ $("whole").onclick=openWhole;$("detail").onclick=()=>openDetail(view.id);
 function zoomBy(value){camera.zoom=Math.max(.54,Math.min(3.5,camera.zoom*value));dirty=true;}
 $("plus").onclick=()=>zoomBy(1.19);$("minus").onclick=()=>zoomBy(1/1.19);$("reset").onclick=resetCamera;
 $("labelToggle").onclick=()=>{view.labels=!view.labels;$("labelToggle").setAttribute("aria-pressed",view.labels);dirty=true;};
+$("immersion").onclick=()=>{
+ view.immersion=!view.immersion;
+ if(view.immersion){view.mode="whole";view.siteMode="daihai";camera.yaw=.18;camera.pitch=.12;camera.zoom=1.34;}
+ else {camera.yaw=.53;camera.pitch=.38;camera.zoom=1.06;}
+ $("immersion").setAttribute("aria-pressed",view.immersion);rebuild();renderUI();
+};
 function updatePlay(){
  $("play").textContent=view.playing?"Ⅱ":"▶";
  $("play").setAttribute("aria-label",view.playing?"暂停流动动画":"播放流动动画");
