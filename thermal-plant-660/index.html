@@ -7,6 +7,7 @@
 <style>
 :root{color-scheme:dark;--base:#090f19;--panel:#101a28;--border:#25354b;--text:#e4effd;--muted:#9bacbf;--accent:#58e1db;font-family:Inter,"Microsoft YaHei",system-ui,sans-serif;color:var(--text);background:var(--base)}*{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer;color:inherit;background:#152236;border:1px solid var(--border);border-radius:7px}button:hover{border-color:var(--accent);color:var(--accent)}button:focus-visible,select:focus-visible,canvas:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button.active,button[aria-pressed="true"]{background:#11343e;border-color:#2d686f;color:#83f3f0}.top{min-height:76px;display:flex;align-items:center;gap:28px;padding:12px 26px;border-bottom:1px solid var(--border);background:#0e1724}.wordmark{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;display:grid;place-items:center;background:#163942;border:1px solid #276b70;border-radius:11px;color:var(--accent);font-size:30px}.wordmark strong{display:block;font-size:19px;letter-spacing:.06em}.wordmark small,.rating span{display:block;color:var(--muted);font-size:12px;letter-spacing:.1em;margin-top:3px}.type{border-left:1px solid var(--border);padding-left:25px;color:#adc6db;font-size:14px}.type i,.viewtag i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:8px;box-shadow:0 0 10px #48ead9}.rating{margin-left:auto;text-align:right;white-space:nowrap}.rating strong{font-size:26px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}.rating strong small{font-size:14px}main{max-width:1920px;margin:auto;padding:19px;display:grid;grid-template-columns:206px minmax(0,1fr) 292px;gap:16px;align-items:start}.systems,.inspector,.sequence{background:var(--panel);border:1px solid var(--border);border-radius:12px}.systems,.inspector{padding:15px;min-width:0}.asidehead{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:675;font-size:15px}.asidehead small,.kicker{color:#83a3bc;font-family:ui-monospace,monospace;letter-spacing:.09em;font-size:10px;font-weight:550}.systems nav{display:grid;gap:6px;margin-top:15px}.sys{text-align:left;display:flex;align-items:center;gap:9px;padding:9px 8px;font-size:14px;background:transparent;border-color:transparent}.sys b{background:#20344a;color:#a5d4e6;border-radius:5px;display:grid;place-items:center;width:25px;height:25px;font-size:13px}.legend{margin-top:17px;padding-top:15px;border-top:1px solid var(--border)}#legend{display:grid;gap:2px;margin-top:10px}.flow{border-color:transparent;background:transparent;text-align:left;padding:5px 4px;display:flex;align-items:center;gap:8px;font-size:13px;color:#c6d6e6}.flow[aria-pressed="true"]{background:transparent;border-color:transparent;color:#c6d6e6}.flow[aria-pressed="false"]{opacity:.42}.flow span{display:inline-block;width:17px;height:4px;background:var(--color);border-radius:4px;box-shadow:0 0 8px color-mix(in srgb,var(--color),transparent 50%)}.flow em{font-style:normal;margin-left:auto;font-size:11px;color:#a4b7ce}.work{min-width:0}.workhead{display:flex;align-items:end;justify-content:space-between;gap:10px;padding:4px 0 14px}.kicker{color:#74d7d3;font-size:11px}h1{font-size:28px;margin:5px 0;line-height:1.2}p{line-height:1.6}.workhead p{margin:4px 0 0;font-size:14px;color:var(--muted)}.switch{display:flex;gap:5px;flex-shrink:0}.switch button{padding:8px 9px;font-size:13px}.viewport{position:relative;height:clamp(450px,62vh,790px);overflow:hidden;border:1px solid #2c4158;border-radius:12px 12px 0 0;background:radial-gradient(ellipse at 42% 30%,#172c40 0%,#0e1d2d 55%,#0a1420 100%)}canvas{width:100%;height:100%;display:block;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}.viewtag,.hint{position:absolute;pointer-events:none;color:#adc1d6;background:#0a1724dc;border:1px solid #283d51;border-radius:6px;padding:7px 10px;font-size:12px}.viewtag{top:12px;left:12px}.hint{bottom:11px;left:12px}.hint b{color:#64dfd8;padding:0 4px}.camera{position:absolute;right:11px;bottom:11px;display:grid;gap:4px}.camera button{height:34px;width:34px;font-size:19px;background:#112335}.label{position:absolute;transform:translate(-50%,-100%);background:#0a1829e8;color:#dbeafb;border:1px solid #46617b;white-space:nowrap;border-radius:4px;font-size:11px;padding:3px 6px;z-index:2;box-shadow:0 2px 8px #0008}.label:hover,.label.selected{border-color:#69f1e4;color:#a4f8ef;z-index:4}.label.part{border-color:#438f95;color:#abf7f3}.timeline{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-top:0;border-radius:0 0 12px 12px}.play{height:34px;width:38px;color:#87f0e4;background:#133440;border-color:#2c6267}.timecaption strong,.timecaption small{display:block}.timecaption strong{font-size:13px}.timecaption small{font-size:11px;color:var(--muted)}.speedwrap{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}select{color:var(--text);background:#142437;border:1px solid var(--border);border-radius:6px;padding:5px}.timeline>button:last-child{font-size:13px;padding:6px 8px}.sequence{margin-top:12px;padding:11px 13px}#chain{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;align-items:center}#chain button{font-size:12px;padding:5px 7px}#chain i{font-size:12px;color:#7292ab;font-style:normal}.inspector{min-height:390px}#info{margin-top:14px}.badge{display:inline-block;color:#75e7df;background:#113842;border-radius:4px;padding:3px 7px;font-size:12px}.inspector h2{margin:8px 0 4px;font-size:24px;line-height:1.2}.inspector p{margin:8px 0;color:#aebfd1;font-size:14px}.inspector h3{font-size:15px;margin:15px 0 7px}.inspector dl{margin:12px 0;display:grid;gap:6px}.inspector dl div{display:flex;justify-content:space-between;gap:10px;padding:7px 8px;background:#142236;border-radius:5px;font-size:12px}.inspector dt{color:#a8bcd1}.inspector dd{margin:0;color:#e2f4fd;text-align:right}.inspectButton{width:100%;padding:9px;font-size:14px;background:#11323e;border-color:#2c676b;color:#8df1e8}.equiplist,.parts{display:grid;gap:5px}.equiplist{grid-template-columns:1fr 1fr}.equiplist button,.parts button{padding:7px;text-align:left;font-size:13px;min-width:0}.partnote{padding:7px 9px;background:#102b37;border-left:2px solid var(--accent);border-radius:4px}.range{display:grid;gap:5px;margin-top:12px;font-size:13px;color:#b6c9db}.range input{width:100%;accent-color:#60e4df}footer{max-width:1920px;margin:0 auto;padding:0 20px 17px;display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12px;color:#93a9bf}footer a{color:#86d6db;text-decoration:none}footer a:hover{text-decoration:underline}@media(max-width:1150px){main{grid-template-columns:164px minmax(0,1fr) 238px;gap:10px;padding:12px}.systems,.inspector{padding:11px}.viewport{height:clamp(440px,60vh,740px)}}@media(max-width:900px){main{grid-template-columns:155px minmax(0,1fr)}.inspector{grid-column:2}.workhead{align-items:start}.workhead p{font-size:13px}.viewport{height:clamp(420px,61vh,680px)}}@media(max-width:620px){.top{padding:10px 12px;min-height:63px;gap:8px}.type{display:none}.wordmark strong{font-size:17px}.logo{width:34px;height:34px}.rating strong{font-size:21px}main{display:flex;flex-direction:column;padding:9px;gap:10px}.systems,.work,.inspector{width:100%}.systems nav{display:flex;overflow:auto;margin-top:8px}.sys{white-space:nowrap;padding:5px}.sys b{width:21px;height:21px}.legend{margin-top:7px;padding-top:6px}.legend .asidehead{display:none}#legend{display:flex;overflow:auto;margin:1px 0}.flow{white-space:nowrap;padding:5px}.flow em{display:none}.workhead{padding:2px 0 8px}h1{font-size:23px}.switch button{padding:6px;font-size:12px}.viewport{height:clamp(370px,58vh,500px)}.label{font-size:10px;padding:2px 3px}.inspector{min-height:0}.hint{font-size:10px}.timeline{gap:8px}}
 .reference-nav{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:11px;padding:8px 10px;border:1px solid #305562;border-radius:8px;background:#102532}.reference-nav span{color:#96e2dd;font-size:13px;font-weight:650;margin-right:4px}.reference-nav button,.reference-tools button{padding:6px 8px;font-size:13px}.reference-tools{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:10px 0}.reference-sources{margin:6px 0;padding-left:18px;line-height:1.65;font-size:13px;color:#8edbdc}.reference-sources a{color:inherit;text-underline-offset:2px;overflow-wrap:anywhere}
+.site-nav{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:11px;padding:8px 10px;border:1px solid #3a5367;border-radius:8px;background:#111f2d}.site-nav span{color:#c1d1e1;font-size:13px;font-weight:650;margin-right:4px}.site-nav button{padding:6px 8px;font-size:13px}.site-nav button[aria-pressed="true"]{background:#133d46;border-color:#4c9997;color:#a5f2ec}
 
 </style>
 </head>
@@ -15,18 +16,19 @@
 <main>
 <aside class="systems"><div class="asidehead"><span>系统导航</span><small>SYSTEMS</small></div><nav id="systems" aria-label="系统导航"></nav><div class="legend"><div class="asidehead"><span>流股图例</span><small>FLOW KEY</small></div><div id="legend"></div></div></aside>
 <section class="work" aria-label="3D 模型">
-<div class="workhead"><div><span class="kicker">机组全流程 · 离线精模版</span><h1 id="viewTitle">全厂总览</h1><p id="viewSub">点击设备查看结构，沿彩色管线追踪物质与能量。</p></div><div class="switch" aria-label="视图模式"><button id="whole" class="active">全厂视图</button><button id="detail">设备视图</button></div></div>
+<div class="workhead"><div><span class="kicker">机组全流程 · 岱海厂区精模版</span><h1 id="viewTitle">全厂总览</h1><p id="viewSub">点击设备查看结构，沿彩色管线追踪物质与能量。</p></div><div class="switch" aria-label="视图模式"><button id="whole" class="active">全厂视图</button><button id="detail">设备视图</button></div></div>
 <div class="viewport" id="viewport"><canvas id="scene" tabindex="0" aria-label="互动 3D 场景，使用方向键旋转，加减键缩放"></canvas><div id="labels"></div>
 <div class="viewtag"><i></i><span id="viewTag">全厂 · 3D 场景</span></div>
 <div class="camera"><button id="plus" title="放大" aria-label="放大">+</button><button id="minus" title="缩小" aria-label="缩小">−</button><button id="reset" title="重置视角" aria-label="重置视角">⟲</button></div>
 <div class="hint">拖动旋转 <b>·</b> 滚轮 / 双指缩放 <b>·</b> 点击选择</div></div>
 <div class="timeline"><button id="play" class="play" aria-label="暂停流动动画">Ⅱ</button><div class="timecaption"><strong>流动动画</strong><small id="playState">播放中</small></div><div class="speedwrap"><label for="speed">速度</label><select id="speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div><button id="labelToggle" aria-pressed="true">设备标签</button></div>
+<nav class="site-nav" aria-label="厂区模式"><span>厂区模式</span><button data-site="daihai" aria-pressed="true">京能岱海 · 公开资料复原</button><button data-site="generic" aria-pressed="false">通用 660 MW 单元</button></nav>
 <nav class="reference-nav" aria-label="实物结构精模"><span>工程图对照</span><button data-reference="boiler">直流锅炉</button><button data-reference="turbine">汽轮机组</button><button data-reference="cond">凝汽器</button></nav>
 <section class="sequence"><div class="asidehead"><span>流程导览</span><small>PROCESS</small></div><div id="chain"></div></section>
 </section>
 <aside class="inspector"><div class="asidehead"><span>学习面板</span><small>INSPECTOR</small></div><div id="info" aria-live="polite"></div></aside>
 </main>
-<footer><span>660 MW 超临界燃煤机组教学模型 · 全厂布置与动画为示意 · 精模来源见设备面板</span><a href="https://openjicareport.jica.go.jp/pdf/12149506_02.pdf" target="_blank" rel="noopener">660 MW 参考配置</a><a href="https://netl.doe.gov/projects/files/CostandPerformanceBaselineFossilEnergyPlantsVolume1BituminousCoalNaturalGastoElectricity_052125.pdf" target="_blank" rel="noopener">NETL 流程参考</a></footer>
+<footer><span>660 MW 超临界燃煤机组教学模型 · 岱海厂区为公开资料复原 · 精模来源见设备面板</span><a href="https://openjicareport.jica.go.jp/pdf/12149506_02.pdf" target="_blank" rel="noopener">660 MW 参考配置</a><a href="https://netl.doe.gov/projects/files/CostandPerformanceBaselineFossilEnergyPlantsVolume1BituminousCoalNaturalGastoElectricity_052125.pdf" target="_blank" rel="noopener">NETL 流程参考</a></footer>
 <script>
 "use strict";
 const flows = {
@@ -597,7 +599,7 @@ function buildReference(unit){
 const $ = id => document.getElementById(id);
 const canvas = $("scene"), ctx = canvas.getContext("2d");
 const visible = Object.fromEntries(Object.keys(flows).map(key=>[key,true]));
-const view = {system:"all",id:"boiler",mode:"whole",picked:false,part:0,arrangement:"section",isolate:false,internalFlow:false,spread:.7,labels:true,playing:!matchMedia("(prefers-reduced-motion: reduce)").matches,speed:1};
+const view = {system:"all",id:"boiler",mode:"whole",picked:false,siteMode:"daihai",part:0,arrangement:"section",isolate:false,internalFlow:false,spread:.7,labels:true,playing:!matchMedia("(prefers-reduced-motion: reduce)").matches,speed:1};
 const camera = {yaw:.53,pitch:.60,zoom:1};
 let mesh=[], hit=[], marks=[], width=1,height=1, size=1, clock=0, last=0, dirty=true;
 let items=[], center=[0,0,0];
@@ -865,9 +867,52 @@ function activePath(path){return view.system==="all" || path.systems.split(" ").
 function activeUnit(unit){
  return view.system==="all" || unit.group===view.system || paths.some(path=>activePath(path)&&(path.from===unit.id||path.to===unit.id));
 }
+function daihaiSite(){
+ center=[1,0,1];
+ box(null,[2,-1.04,1],[142,1.9,96],"#213b4e");
+ box(null,[2,-.10,1],[141,.12,95],"#28485a");
+ // 岱海位于厂区北侧，公开资料仅用于方向关系示意，不代表测绘边界。
+ box(null,[2,.00,-47],[138,.08,8],"#295f70");
+ for(let x=-66;x<=70;x+=4)line(null,[[x,.02,-42],[x,.02,44]],"#466374",1,.34);
+ for(let z=-42;z<=44;z+=4)line(null,[[-68,.02,z],[72,.02,z]],"#466374",1,.34);
+ // 四台机组岛，1、2 号按公开资料保留历史水冷改造标识，3、4 号按 660 MW 增容单元表达。
+ const units=[[-47,"1# 600 MW"],[-16,"2# 600 MW"],[17,"3# 660 MW"],[50,"4# 660 MW"]];
+ units.forEach(([x,label],index)=>{
+  box(null,[x,.12,4],[24,.18,30],index<2?"#2d5061":"#31566a");
+  marks.push({id:"boiler",at:[x,8,3],name:label+" · 锅炉岛"});
+  box(null,[x,1.05,3],[18,1.7,16],"#607d91");
+  box(null,[x,4.0,3],[10,5.8,10],"#6f8796");
+  for(const zz of [-2.8,3.0,8.8])box(null,[x-6.5,2.2,zz],[.18,3.6,16],"#9fb4c1");
+  line(null,[[x-10,.26,-4],[x+10,.26,-4]],index<2?"#4f9cb0":"#6eb6c4",1.4,.8);
+  // 承担 54 台风机的空冷岛，按 9×6 阵列表达
+  const acx=x,acz=24;
+  box(null,[acx,.2,acz],[23,.26,18],"#355d6c");
+  for(let row=0;row<6;row++)for(let col=0;col<9;col++){
+   const fx=acx+(col-4)*2.25,fz=acz+(row-2.5)*2.55;
+   cyl(null,[fx,1.0,fz],.74,.28,"#9dbbc2","y",.74,12,false);
+   for(let b=0;b<5;b++){const ang=b*tau/5;line(null,[[fx,1.17,fz],[fx+Math.cos(ang)*.62,1.18,fz+Math.sin(ang)*.62]],"#e0e9e8",1.2,.7)}
+  }
+  // 空冷岛至汽机房的主蒸汽/排汽管廊
+  const rackx=x+11.7;
+  for(const h of [2.4,3.1,3.8,4.5])pipingSite([[rackx,h,-4],[rackx,h,24]],"#a37a5d",.12);
+  for(const z of [-4,24]){box(null,[rackx,.9,z],[.22,2, .22],"#7894a5");box(null,[rackx+1.5,.9,z],[.22,2,.22],"#7894a5");}
+ });
+ // 燃煤与烟气公用系统区
+ box(null,[-54,.12,37],[18,.18,8],"#4d5a63");
+ for(const x of [-61,-57,-53,-49])cyl(null,[x,1.0,37],1.25,2.0,"#68757d","y",1.25,14);
+ box(null,[68,.12,8],[8,.18,66],"#334d5c");
+ for(const z of [-21,0,21])cyl(null,[68,4.0,z],2.2,8.0,"#a27b6b","y",1.28,18);
+ for(const x of [-49,-18,15,48])pipingSite([[x,1.2,13],[x,1.2,34],[68,1.2,34],[68,1.2,13]],"#b57862",.18);
+ // 纵向输煤栈桥与厂内道路
+ pipingSite([[-66,3,37],[-50,3,37],[-34,3,37],[-18,3,37]],"#bd9560",.45);
+ for(const x of [-68,-35,0,35,70])box(null,[x,.06,13],[.9,.12,62],"#536b7c");
+}
+function pipingSite(points,color,r){for(let i=1;i<points.length;i++)rod(null,points[i-1],points[i],r,color,8);}
 function rebuild(){
  mesh=[];marks=[];
  if(view.mode==="whole"){
+  if(view.siteMode==="daihai")daihaiSite();
+  else {
   center=[1,0,0];
   box(null,[2,-1.04,0],[124,1.9,84],"#223b50");
   box(null,[2,-.10,0],[123,.12,83],"#254254");
@@ -879,6 +924,7 @@ function rebuild(){
   for(const z of [-40.8,40.8])box(null,[2,.05,z],[122,.09,.15],"#628798");
   for(const x of [-58.8,62.8])box(null,[x,.05,0],[.15,.09,81.6],"#628798");
   for(const unit of Object.values(plant))overview(unit);
+  }
  }else{
   const unit=plant[view.id];
   const ref=referenceEquipment[unit.id];
@@ -1123,7 +1169,8 @@ function buildMenus(){
 function renderUI(){
  const system=systems.find(s=>s[0]===view.system),unit=plant[view.id],detail=view.mode==="detail";
  $("viewTitle").textContent=detail?unit.name:system[2];
- $("viewSub").textContent=detail?"拖动观察内部结构，点击部件查看原理。":view.system==="all"?"点击设备查看结构，沿彩色管线追踪物质与能量。":system[3];
+ $("viewSub").textContent=detail?"拖动观察内部结构，点击部件查看原理。":view.siteMode==="daihai"?"京能岱海公开资料复原：4 台机组、北侧空冷岛、输煤与烟气净化区。点击设备进入精模。":view.system==="all"?"点击设备查看结构，沿彩色管线追踪物质与能量。":system[3];
+ for(const button of document.querySelectorAll("[data-site]"))button.setAttribute("aria-pressed",button.dataset.site===view.siteMode);
  $("viewTag").textContent=detail?referenceEquipment[view.id]?.title??"设备 · 拆解视图":"全厂 · 3D 场景";
  for(const button of document.querySelectorAll("[data-reference]"))button.setAttribute("aria-pressed",detail&&button.dataset.reference===view.id);
  $("whole").classList.toggle("active",!detail);$("whole").setAttribute("aria-pressed",!detail);
@@ -1142,7 +1189,8 @@ function renderPanel(){
  const equipment=Object.values(plant).filter(activeUnit);
  const list=equipment.map(u=>'<button data-unit="'+u.id+'" class="'+(view.picked&&u.id===view.id?"active":"")+'">'+u.name+'</button>').join("");
  if(!view.picked){
-  $("info").innerHTML='<h2>设备索引</h2><p>从总览选择设备，查看进出口、工作原理和内部部件。</p><div class="equiplist">'+list+'</div>';
+  const siteFacts=view.siteMode==="daihai"?'<span class="badge">京能岱海 · 公开资料复原</span><h2>厂区环境</h2><p>岱海发电公司位于岱海南岸，公开报道显示共有 4 台机组，总装机约 252 万 kW。北侧为空冷岛，每台机组采用 54 台风机散热。3、4 号机组由 600 MW 增容至 660 MW。</p><dl><div><dt>厂区构型</dt><dd>四机组 · 空冷岛</dd></div><div><dt>空冷风机</dt><dd>54 台 / 机组</dd></div><div><dt>公开资料状态</dt><dd>方向关系复原</dd></div></dl>':'<h2>设备索引</h2><p>从总览选择设备，查看进出口、工作原理和内部部件。</p>';
+  $("info").innerHTML=siteFacts+'<h3>设备索引</h3><div class="equiplist">'+list+'</div>';
   return;
  }
  const rows=[["入口",unit.ports[0]],["出口",unit.ports[1]],...unit.stats].map(([k,v])=>"<div><dt>"+k+"</dt><dd>"+v+"</dd></div>").join("");
@@ -1166,6 +1214,12 @@ function referenceControls(){
   btn("isolate","部件独看",view.isolate)+btn("internal","内部流向",view.internalFlow&&section&&!view.isolate)+
   '<button data-action="orthographic">侧剖视角</button></div>';
 }
+document.querySelector(".site-nav").addEventListener("click",event=>{
+ const button=event.target.closest("[data-site]");
+ if(!button)return;
+ view.siteMode=button.dataset.site;
+ view.mode="whole";view.picked=false;rebuild();renderUI();
+});
 document.querySelector(".reference-nav").addEventListener("click",event=>{
  const button=event.target.closest("[data-reference]");
  if(button)openDetail(button.dataset.reference);
