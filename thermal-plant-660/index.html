@@ -11,6 +11,7 @@
 .viewport{background:linear-gradient(165deg,#d7e4e5 0%,#bccfd1 50%,#9fb6b9 100%)}
 
 .viewport:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 18% 17%,rgba(255,255,255,.82) 0 7%,rgba(255,255,255,0) 18%),radial-gradient(ellipse at 71% 12%,rgba(255,255,255,.66) 0 5%,rgba(255,255,255,0) 17%),linear-gradient(180deg,rgba(174,218,237,.58) 0%,rgba(220,235,230,.22) 44%,rgba(145,168,160,.16) 100%)}.viewport canvas,.viewport #labels,.viewport .viewtag,.viewport .camera,.viewport .hint{position:relative;z-index:1}.viewport canvas{background:transparent}.timeline button[aria-pressed="true"]{background:#164e55;border-color:#5da9a6;color:#b7fff6}
+.control-panel{margin-top:12px;padding:14px 15px;background:linear-gradient(135deg,#101f2d,#132b35);border:1px solid #315766;border-radius:12px}.control-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.control-head h2{font-size:18px;margin:3px 0}.state-badge{padding:5px 9px;border-radius:5px;font-size:12px;font-weight:650;border:1px solid}.state-badge.cold{color:#aebfd0;border-color:#526a7c;background:#1c2c3d}.state-badge.run{color:#b9fff0;border-color:#48a895;background:#14423f}.state-badge.alarm{color:#ffe0b2;border-color:#bd7656;background:#4b2d29}.control-grid{display:grid;grid-template-columns:1.25fr 1fr 1fr 1fr 2.1fr;gap:10px;align-items:end;margin-top:12px}.control-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}.control-actions button{padding:7px 6px;font-size:12px;background:#172f3d}.control-actions button[data-op=trip]{color:#ffc2a8;border-color:#754b4b}.load-control{display:grid;gap:5px;color:#b7c9d8;font-size:12px}.load-control strong{color:#8ef0e5;font-size:13px}.load-control input{width:100%;accent-color:#50d3c5}.control-readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.control-readouts div{min-width:0;padding:7px 6px;background:#0e1b28;border:1px solid #263e50;border-radius:5px}.control-readouts span,.control-readouts b,.control-readouts em{display:block}.control-readouts span{font-size:10px;color:#9bb1c2;white-space:nowrap}.control-readouts b{font-size:17px;color:#f1f7fa;line-height:1.25}.control-readouts em{font-size:10px;color:#70a9b0;font-style:normal}.control-log{margin-top:10px;padding:8px 10px;background:#0c1925;border-radius:6px;max-height:62px;overflow:auto;font-size:11px;color:#9bb2c4}.control-log span{color:#80dfd7}.control-log p{margin:4px 0 0;color:#d4e5e9}.control-panel button[disabled]{opacity:.42;cursor:not-allowed}@media(max-width:1150px){.control-grid{grid-template-columns:1fr 1fr 1fr}.control-actions{grid-column:span 3;grid-template-columns:repeat(5,1fr)}}@media(max-width:620px){.control-grid{grid-template-columns:1fr 1fr}.control-actions{grid-column:span 2;grid-template-columns:repeat(3,1fr)}.control-readouts{grid-column:span 2}.control-head h2{font-size:16px}}
 
 </style>
 <script>
@@ -594,6 +595,7 @@ const canvas = $("scene"), ctx = canvas.getContext("2d");
 const visible = Object.fromEntries(Object.keys(flows).map(key=>[key,true]));
 const view = {system:"all",id:"boiler",mode:"whole",picked:false,siteMode:"daihai",part:0,arrangement:"section",isolate:false,internalFlow:false,immersion:false,spread:.7,labels:true,playing:!matchMedia("(prefers-reduced-motion: reduce)").matches,speed:1};
 const camera = {yaw:.53,pitch:.28,zoom:1.30};
+const operation={state:"cold",load:0,coal:0,air:0,rpm:0,log:["系统已复位，等待运行操作。"]};
 let mesh=[], hit=[], marks=[], width=1,height=1, size=1, clock=0, last=0, dirty=true, siteRoutes=[];
 let items=[], center=[0,0,0];
 const tau=2*Math.PI;
@@ -1101,7 +1103,7 @@ function draw(){
  ctx.clearRect(0,0,width,height);
  ctx.drawImage(backdrop,0,0,width,height);
  for(const {path,segments,length} of shownStreams){
-  const speed={coal:5,air:10,gas:8,steam:12,reheat:8,water:6,cool:7,ash:4,power:17,heat:8}[path.kind];
+  const speed={coal:5,air:10,gas:8,steam:12,reheat:8,water:6,cool:7,ash:4,power:17,heat:8}[path.kind]*(operation.state==="run"?Math.max(.35,operation.load/660):.24);
   const count=Math.min(14,Math.max(2,Math.ceil(length/5)));
   const color=flows[path.kind][1];
   for(let i=0;i<count;i++){
@@ -1307,6 +1309,47 @@ $("immersion").onclick=()=>{
  else {camera.yaw=.53;camera.pitch=.28;camera.zoom=1.30;}
  $("immersion").setAttribute("aria-pressed",view.immersion);rebuild();renderUI();
 };
+function operationLog(message){
+ operation.log.unshift(new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" · "+message);
+ operation.log=operation.log.slice(0,6);
+ const log=$("controlLog");if(log)log.innerHTML="<span>操作记录</span>"+operation.log.map(item=>"<p>"+item+"</p>").join("");
+}
+function updateOperationUI(){
+ const badge=$("unitState");
+ const names={cold:"冷态备用",start:"点火升温",roll:"汽轮机冲转",run:"并网运行",alarm:"跳闸待复位"};
+ if(badge){badge.textContent=names[operation.state];badge.className="state-badge "+(operation.state==="alarm"?"alarm":operation.state==="cold"?"cold":"run");}
+ for(const [id,value] of [["loadValue",operation.load],["coalValue",operation.coal],["airValue",operation.air],["rpmValue",operation.rpm]]){const el=$(id);if(el)el.textContent=Math.round(value);}
+ const pressure=$("mainPressure"),temp=$("mainTemp"),vacuum=$("vacuumValue");
+ if(pressure)pressure.textContent=(operation.state==="cold"?0:8.5+operation.load*.022).toFixed(1);
+ if(temp)temp.textContent=Math.round(operation.state==="cold"?25:330+operation.load*.36);
+ if(vacuum)vacuum.textContent=operation.state==="run"?(82+operation.load*.012).toFixed(1):0;
+ const ls=$("loadSlider"),cs=$("coalSlider"),as=$("airSlider");
+ if(ls)ls.value=operation.load;if(cs)cs.value=operation.coal;if(as)as.value=operation.air;
+}
+function setOperation(action){
+ if(action==="boiler-start"&&operation.state==="cold"){
+  operation.state="start";operation.coal=25;operation.air=30;operation.rpm=0;operationLog("锅炉点火，投入少量燃料并建立炉膛通风");
+ }else if(action==="turbine-roll"&&operation.state==="start"){
+  operation.state="roll";operation.coal=42;operation.air=48;operation.rpm=1500;operationLog("汽轮机冲转至 1500 r/min，检查振动与胀差");
+ }else if(action==="grid-sync"&&operation.state==="roll"){
+  operation.state="run";operation.load=300;operation.coal=58;operation.air=62;operation.rpm=3000;operationLog("发电机同期并网，机组进入带初负荷运行");
+ }else if(action==="trip"&&operation.state!=="cold"){
+  operation.state="alarm";operation.load=0;operation.coal=0;operation.air=18;operation.rpm=0;operationLog("模拟汽轮机跳闸，联锁切断进汽并保持炉膛安全通风");
+ }else if(action==="alarm-reset"&&operation.state==="alarm"){
+  operation.state="cold";operation.air=0;operationLog("报警确认完成，保护复归，等待重新启动");
+ }else{
+  operationLog("当前状态不满足该操作条件");
+ }
+ updateOperationUI();dirty=true;
+}
+function bindOperationPanel(){
+ document.querySelectorAll("[data-op]").forEach(button=>button.addEventListener("click",()=>setOperation(button.dataset.op)));
+ const load=$("loadSlider"),coal=$("coalSlider"),air=$("airSlider");
+ if(load)load.addEventListener("input",()=>{operation.load=Number(load.value);if(operation.load>0&&operation.state==="run"){operation.coal=Math.round(operation.load/660*70);operation.air=Math.round(operation.load/660*76);}updateOperationUI();dirty=true;});
+ if(coal)coal.addEventListener("input",()=>{operation.coal=Number(coal.value);updateOperationUI();dirty=true;});
+ if(air)air.addEventListener("input",()=>{operation.air=Number(air.value);updateOperationUI();dirty=true;});
+ updateOperationUI();
+}
 function updatePlay(){
  $("play").textContent=view.playing?"Ⅱ":"▶";
  $("play").setAttribute("aria-label",view.playing?"暂停流动动画":"播放流动动画");
@@ -1362,7 +1405,7 @@ canvas.addEventListener("keydown",e=>{
  }
  e.preventDefault();clampPitch();dirty=true;
 });
-fit();buildMenus();rebuild();renderUI();updatePlay();requestAnimationFrame(animate);
+fit();buildMenus();rebuild();renderUI();updatePlay();bindOperationPanel();requestAnimationFrame(animate);
 
 </script>
 
@@ -1378,6 +1421,16 @@ fit();buildMenus();rebuild();renderUI();updatePlay();requestAnimationFrame(anima
 <div class="camera"><button id="plus" title="放大" aria-label="放大">+</button><button id="minus" title="缩小" aria-label="缩小">−</button><button id="reset" title="重置视角" aria-label="重置视角">⟲</button></div>
 <div class="hint">拖动旋转 <b>·</b> 滚轮 / 双指缩放 <b>·</b> 点击选择</div></div>
 <div class="timeline"><button id="play" class="play" aria-label="暂停流动动画">Ⅱ</button><div class="timecaption"><strong>流动动画</strong><small id="playState">播放中</small></div><div class="speedwrap"><label for="speed">速度</label><select id="speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div><button id="labelToggle" aria-pressed="true">设备标签</button><button id="immersion" aria-pressed="false">第一视角</button></div>
+<section class="control-panel" aria-label="集控运行练习">
+<div class="control-head"><div><span class="kicker">集控运行 · TRAINING</span><h2>机组运行操作</h2></div><span id="unitState" class="state-badge cold">冷态备用</span></div>
+<div class="control-grid">
+<div class="control-actions"><button data-op="boiler-start">锅炉点火</button><button data-op="turbine-roll">汽轮机冲转</button><button data-op="grid-sync">同期并网</button><button data-op="trip">模拟跳闸</button><button data-op="alarm-reset">报警确认</button></div>
+<label class="load-control">机组负荷 <strong><span id="loadValue">0</span> MW</strong><input id="loadSlider" type="range" min="0" max="660" step="10" value="0"></label>
+<label class="load-control">给煤量 <strong><span id="coalValue">0</span> %</strong><input id="coalSlider" type="range" min="0" max="100" step="1" value="0"></label>
+<label class="load-control">送风量 <strong><span id="airValue">0</span> %</strong><input id="airSlider" type="range" min="0" max="100" step="1" value="0"></label>
+<div class="control-readouts"><div><span>主汽压力</span><b id="mainPressure">0.0</b><em>MPa</em></div><div><span>主汽温度</span><b id="mainTemp">25</b><em>°C</em></div><div><span>汽轮机转速</span><b id="rpmValue">0</b><em>r/min</em></div><div><span>凝汽器真空</span><b id="vacuumValue">0</b><em>kPa</em></div></div>
+</div><div class="control-log" id="controlLog" aria-live="polite"><span>操作记录</span><p>系统已复位，等待运行操作。</p></div>
+</section>
 <nav class="site-nav" aria-label="厂区模式"><span>厂区模式</span><button data-site="daihai" aria-pressed="true">京能岱海 · 公开资料复原</button><button data-site="generic" aria-pressed="false">通用 660 MW 单元</button></nav>
 <nav class="reference-nav" aria-label="实物结构精模"><span>工程图对照</span><button data-reference="boiler">直流锅炉</button><button data-reference="turbine">汽轮机组</button><button data-reference="cond">凝汽器</button></nav>
 <section class="sequence"><div class="asidehead"><span>流程导览</span><small>PROCESS</small></div><div id="chain"></div></section>
