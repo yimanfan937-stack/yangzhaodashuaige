@@ -566,13 +566,22 @@ const referenceRoutes={
 };
 function buildReference(unit){
  const entry=referenceEquipment[unit.id];
+ const palettes={
+  boiler:["#4f92ad","#68b9c3","#e6a85d","#9a6f58","#8fd2d6","#ef6f8f","#c26e86","#b08dd2","#49a7d4","#d2b47b","#6d8495"],
+  turbine:["#7e8fa3","#c8a15d","#a6c4d4","#b487c9","#6aa7c4","#d58b62","#8698aa","#c8cfd5","#e0a54f","#637889"],
+  cond:["#4d9db5","#59c6d0","#9cb8ca","#6e9bb5","#718b9a","#54b7c1","#e0a85f","#9b7d64"]
+ };
+ const palette=palettes[unit.id]||[];
  const move=view.arrangement==="exploded"?view.spread:0;
  unit.parts.forEach((part,i)=>{
   if(view.isolate&&view.part!==i)return;
   const shift=part.offset.map((v,j)=>v*move*(j===1?2.5:3.1));
   const first=mesh.length;
   detailedGeometry[unit.id](i,part.kind);
-  for(let k=first;k<mesh.length;k++)mesh[k].points=mesh[k].points.map(pt=>add(pt,shift));
+  for(let k=first;k<mesh.length;k++){
+   mesh[k].points=mesh[k].points.map(pt=>add(pt,shift));
+   if(palette[i])mesh[k].color=palette[i];
+  }
   marks.push({id:i,at:add(part.xyz,shift),name:part.name});
  });
 }
@@ -993,8 +1002,8 @@ function projection(){
  const cp=Math.cos(camera.pitch),sp=Math.sin(camera.pitch);
  const base=referenceEquipment[view.id]?.fit??[25,21];
  const factor=view.arrangement==="exploded"&&referenceEquipment[view.id]?1+view.spread*.25:1;
- size=(view.mode==="whole"?Math.min(width/145,height/92):Math.min(width/base[0],height/base[1])/factor)*camera.zoom;
- const distance=view.mode==="whole"?310:80;
+ size=(view.mode==="whole"?Math.min(width/145,height/92):Math.min(width/base[0],height/base[1])*.72/factor)*camera.zoom;
+ const distance=view.mode==="whole"?310:105;
  projector=(point)=>{
   const [x,y,z]=point.map((v,i)=>v-center[i]);
   const a=ct*x-st*z,b=st*x+ct*z;
@@ -1034,7 +1043,7 @@ function updateProjection(){
   return {...item,points,depth};
  });
  shownStreams=[];
- if(view.mode==="whole"||(view.internalFlow&&view.arrangement==="section"&&!view.isolate)){
+ if(view.mode==="whole"||(view.mode==="detail"&&view.arrangement==="section"&&!view.isolate)){
   const candidates=view.mode==="whole"?(view.siteMode==="daihai"?siteRoutes.map(prepareStream):streams):internalStreams[view.id]??[];
   for(const entry of candidates){
    const {path,segments}=entry;
@@ -1356,6 +1365,7 @@ canvas.addEventListener("keydown",e=>{
 fit();buildMenus();rebuild();renderUI();updatePlay();requestAnimationFrame(animate);
 
 </script>
+
 </head>
 <body>
 <header class="top"><div class="wordmark"><span class="logo">ϟ</span><span><strong>火力发电厂</strong><small>3D 智慧模型</small></span></div><div class="type"><i></i>超临界燃煤机组</div><div class="rating"><strong>660 <small>MW</small></strong><span>单机额定功率</span></div></header>
